@@ -1,6 +1,6 @@
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
-Debug/
-Drivers/
-Middlewares/
-USB_DEVICE/
+RX_Ra02/Debug/
+RX_Ra02/Drivers/
+RX_Ra02/Middlewares/
+RX_Ra02/USB_DEVICE/
