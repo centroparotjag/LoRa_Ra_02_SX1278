@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "st7789.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -106,6 +106,7 @@ int main(void)
   MX_SPI2_Init();
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
+  ST7789_Init(240, 240);
 
   /* USER CODE END 2 */
 
@@ -299,12 +300,12 @@ static void MX_SPI1_Init(void)
   /* SPI1 parameter configuration*/
   hspi1.Instance = SPI1;
   hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_1LINE;
+  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -385,10 +386,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, res_IPS_Pin|res_Ra02_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, dc_IPS_Pin|blk_IPS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, dc_IPS_Pin|pow_hold_Pin|cs_Ra02_Pin|cs_flash_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, pow_hold_Pin|cs_Ra02_Pin|cs_flash_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(blk_IPS_GPIO_Port, blk_IPS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : led_button_Pin */
   GPIO_InitStruct.Pin = led_button_Pin;
@@ -404,12 +405,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(adc_cir_0V_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pin : res_IPS_Pin */
-  GPIO_InitStruct.Pin = res_IPS_Pin;
+  /*Configure GPIO pins : res_IPS_Pin res_Ra02_Pin */
+  GPIO_InitStruct.Pin = res_IPS_Pin|res_Ra02_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(res_IPS_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pin : dc_IPS_Pin */
   GPIO_InitStruct.Pin = dc_IPS_Pin;
@@ -431,13 +432,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : res_Ra02_Pin */
-  GPIO_InitStruct.Pin = res_Ra02_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(res_Ra02_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : pow_button_Pin */
   GPIO_InitStruct.Pin = pow_button_Pin;
@@ -483,6 +477,10 @@ void StartDefaultTask(void const * argument)
   for(;;)
   {
     osDelay(1);
+
+    test_display_demo ();
+
+
   }
   /* USER CODE END 5 */
 }
