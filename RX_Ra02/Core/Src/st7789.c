@@ -477,21 +477,7 @@ void test_display_demo (void){
 }
 
 void disp_test (void){
-
-	uint16_t color = RGB565(255, 0, 0);
-	ST7789_DrawPixel(0, 0, color);
-
-
-	color = RGB565(255, 255, 0);
-	ST7789_DrawPixel(239, 239, color);
-
-
-	color = RGB565(0, 255, 0);
-	ST7789_DrawPixel(10, 100, color);
-
-	ST7789_DrawRectangle(15, 15, 150, 200, color);
-
-	color = RGB565(0, 255, 255);
+	uint16_t color = RGB565(0, 255, 255);
 	ST7789_DrawCircle(80, 80, 30, color);
 
 	color = RGB565(255, 255, 255);
@@ -508,12 +494,15 @@ void disp_test (void){
 
 	color = RGB565(255, 255, 255);
 	//char str[] = {"Test text 1 2 3 4 5 6 7 8 9 10 11 12"};
-	ST7789_DrawString_5x8 (0, 210, "Test text 1 2 3 4 5 6 7 8.",  color);
+	ST7789_DrawString_5x8 (0, 210, "Test text 5x8 pix",  color);
 
+	color = RGB565(255, 10, 10);
+	ST7789_DrawChar_10x16 (180, 10, '3', color);
+	ST7789_DrawString_10x16 (0, 220, "Test text 10x16 pix 0123456789", color);
 }
 
 
-//===============================================================================================
+//=========================== text 5x8 ===================================================
 
 void ST7789_DrawChar_5x8 (int16_t x0, int16_t y0, char character, uint16_t color)
 {
@@ -541,4 +530,36 @@ void ST7789_DrawString_5x8 (int16_t x0, int16_t y0, char * str, uint16_t color)
   }
 }
 
+//=========================== text 10x16 ===================================================
 
+void ST7789_DrawChar_10x16 (int16_t x0, int16_t y0, char character, uint16_t color)
+{
+	int pix = 0x01;
+	int sym = character - 0x20;
+	for (int16_t X= 0; X < 10; ++X) {
+		pix = 0x01;
+		for (int16_t Y= 0; Y < 8; ++Y) {
+			if ( FONT_terminal_10x15[sym][X*2] & pix ) {
+				ST7789_DrawPixel(X + x0, Y + y0, color);
+			}
+			pix = pix << 1;
+		}
+		pix = 0x01;
+		for (int16_t Y= 0; Y < 8; ++Y) {
+			if ( FONT_terminal_10x15[sym][X*2+1] & pix ) {
+				ST7789_DrawPixel(X + x0, Y + 8 + y0, color);
+			}
+			pix = pix << 1;
+		}
+	}
+}
+
+
+void ST7789_DrawString_10x16 (int16_t x0, int16_t y0, char * str, uint16_t color)
+{
+  uint16_t i = 0;
+  while (str[i] != '\0' && i<=24) {
+	  ST7789_DrawChar_10x16  ( x0+(10*i), y0, str[i], color);
+	  i++;
+  }
+}

@@ -15,5 +15,6 @@
   #define CHARS_COLS_LENGTH  5
   // @const Characters
   extern const uint8_t FONT_5x8 [][CHARS_COLS_LENGTH];
+  extern const uint8_t FONT_terminal_10x15[96][20];
 
 #endif /* INC_FONT_H_ */
