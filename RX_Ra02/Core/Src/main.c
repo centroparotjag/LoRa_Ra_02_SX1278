@@ -478,6 +478,8 @@ void StartDefaultTask(void const * argument)
   {
     osDelay(1);
 
+    disp_test ();
+    osDelay(2000);
     test_display_demo ();
 
 

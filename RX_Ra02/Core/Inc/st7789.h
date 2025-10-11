@@ -90,6 +90,9 @@ static void ST7789_DrawLine_Slow(int16_t x1, int16_t y1, int16_t x2, int16_t y2,
 void ST7789_DrawPixel(int16_t x, int16_t y, uint16_t color);
 void ST7789_DrawCircleFilled(int16_t x0, int16_t y0, int16_t radius, uint16_t fillcolor);
 void ST7789_DrawCircle(int16_t x0, int16_t y0, int16_t radius, uint16_t color);
+void ST7789_DrawChar_5x8 (int16_t x0, int16_t y0, char character, uint16_t color);
+void ST7789_DrawString_5x8 (int16_t x0, int16_t y0, char * str, uint16_t color);
 void test_display_demo (void);
+void disp_test (void);
 #endif
 

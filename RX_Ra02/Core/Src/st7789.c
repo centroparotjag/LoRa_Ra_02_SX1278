@@ -7,9 +7,10 @@
 
 
 #include "stm32f4xx_hal.h"
-#include <st7789.h>
-#include "main.h"
 #include <stdlib.h>
+#include "main.h"
+#include <st7789.h>
+#include "font.h"
 
 uint8_t ST7789_Width, ST7789_Height;
 
@@ -17,7 +18,7 @@ void ST7789_Init(uint8_t Width, uint8_t Height)
 {
   ST7789_Width = Width;
   ST7789_Height = Height;
-  HAL_Delay(100);
+  HAL_Delay(15);
   ST7789_HardReset();
   ST7789_SoftReset();
   ST7789_SleepModeExit();
@@ -31,13 +32,13 @@ void ST7789_Init(uint8_t Width, uint8_t Height)
   ST7789_FillScreen(0);
   ST7789_SetBL(10);
   ST7789_DisplayPower(1);
-  HAL_Delay(100);
+  HAL_Delay(150);
 }
 
 void ST7789_HardReset(void)
 {
 	HAL_GPIO_WritePin(res_IPS_GPIO_Port, res_IPS_Pin, GPIO_PIN_RESET);
-	HAL_Delay(10);
+	HAL_Delay(15);
   HAL_GPIO_WritePin(res_IPS_GPIO_Port, res_IPS_Pin, GPIO_PIN_SET);
   HAL_Delay(150);
 }
@@ -76,7 +77,7 @@ void ST7789_SleepModeEnter( void )
 void ST7789_SleepModeExit( void )
 {
 	ST7789_SendCmd(ST7789_Cmd_SLPOUT);
-  HAL_Delay(100);			// 500
+  HAL_Delay(130);
 }
 
 
@@ -246,10 +247,10 @@ void ST7789_DrawRectangleFilled(int16_t x1, int16_t y1, int16_t x2, int16_t y2, 
 
 void ST7789_DrawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
 {
-  // Âåðòèêàëüíàÿ ëèíèÿ
+  // Вертикальная линия
   if (x1 == x2)
   {
-    // Îòðèñîâûâàåì ëèíèþ áûñòðûì ìåòîäîì
+    // Отрисовываем линию быстрым методом
     if (y1 > y2)
       ST7789_FillRect(x1, y2, 1, y1 - y2 + 1, color);
     else
@@ -257,10 +258,10 @@ void ST7789_DrawLine(int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t co
     return;
   }
 
-  // Ãîðèçîíòàëüíàÿ ëèíèÿ
+  // Горизонтальная линия
   if (y1 == y2)
   {
-    // Îòðèñîâûâàåì ëèíèþ áûñòðûì ìåòîäîì
+    // Отрисовываем линию быстрым методом
     if (x1 > x2)
       ST7789_FillRect(x2, y1, x1 - x2 + 1, 1, color);
     else
@@ -473,5 +474,71 @@ void test_display_demo (void){
 
 	        ST7789_FillScreen(BLACK);
 	        ST7789_SetBL(100);
+}
+
+void disp_test (void){
+
+	uint16_t color = RGB565(255, 0, 0);
+	ST7789_DrawPixel(0, 0, color);
+
+
+	color = RGB565(255, 255, 0);
+	ST7789_DrawPixel(239, 239, color);
+
+
+	color = RGB565(0, 255, 0);
+	ST7789_DrawPixel(10, 100, color);
+
+	ST7789_DrawRectangle(15, 15, 150, 200, color);
+
+	color = RGB565(0, 255, 255);
+	ST7789_DrawCircle(80, 80, 30, color);
+
+	color = RGB565(255, 255, 255);
+	ST7789_DrawLine(80, 80, 150, 200, color);
+
+	color = RGB565(055, 120, 255);
+	ST7789_DrawRectangleFilled(20, 20, 45, 45, color);
+
+	color = RGB565(200, 120, 255);
+	ST7789_DrawCircleFilled(40, 150, 20, color);
+
+	color = RGB565(0, 0, 0);
+	ST7789_DrawChar_5x8 (40, 150, '#', color);
+
+	color = RGB565(255, 255, 255);
+	//char str[] = {"Test text 1 2 3 4 5 6 7 8 9 10 11 12"};
+	ST7789_DrawString_5x8 (0, 210, "Test text 1 2 3 4 5 6 7 8.",  color);
 
 }
+
+
+//===============================================================================================
+
+void ST7789_DrawChar_5x8 (int16_t x0, int16_t y0, char character, uint16_t color)
+{
+	int pix = 0x01;
+	int sym = character - 0x20;
+
+	for (int16_t X= 0; X < 5; ++X) {
+		pix = 0x01;
+		for (int16_t Y= 0; Y < 8; ++Y) {
+			if ( FONT_5x8[sym][X] & pix ) {
+				ST7789_DrawPixel(X + x0, Y + y0, color);
+			}
+			pix = pix << 1;
+		}
+	}
+}
+
+
+void ST7789_DrawString_5x8 (int16_t x0, int16_t y0, char * str, uint16_t color)
+{
+  uint16_t i = 0;
+  while (str[i] != '\0' && i<=34) {
+	  ST7789_DrawChar_5x8 ( x0+(7*i), y0, str[i], color);
+	  i++;
+  }
+}
+
+
