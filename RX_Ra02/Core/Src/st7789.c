@@ -391,115 +391,115 @@ void ST7789_DrawCircle(int16_t x0, int16_t y0, int16_t radius, uint16_t color)
 
 //-------------------------------------------------------------------------------------------------------
 
-void test_display_demo (void){
-	//    ST7789_Init(240, 240);
-	    	  // Инициализация входа для кнопки
-	        // Тест вывода основных цветов
-	        //ST7789_FillScreen(BLACK);
-	        ST7789_SetBL(100);
-
-	        uint16_t color = RGB565(255, 0, 0);
-	        ST7789_FillScreen(color);
-	        osDelay(200); //HAL_Delay(500);
-
-	        color = RGB565(0, 255, 0);
-	        ST7789_FillScreen(color);
-	        osDelay(200);
-
-	        color = RGB565(50, 55, 50);
-	        ST7789_FillScreen(color);
-	        osDelay(200);
-
-	        color = RGB565(0, 0, 255);
-	        ST7789_FillScreen(color);
-	        osDelay(200);
-
-	        color = RGB565(255, 255, 0);
-	        ST7789_FillScreen(color);
-	        osDelay(200);
-
-	        color = RGB565(255, 0, 255);
-	        ST7789_FillScreen(color);
-	        osDelay(200);
-
-	        color = RGB565(0, 255, 255);
-	        ST7789_FillScreen(color);
-	        osDelay(200);
-
-	        color = RGB565(255, 255, 255);
-	        ST7789_FillScreen(color);
-	        osDelay(200);
-
-	        ST7789_FillScreen(BLACK);
-	        ST7789_SetBL(100);
-
-	    		for (uint8_t y = 0; y<240 ; y++) {
-	    			ST7789_DrawLine(120, 120, 239, y, RGB565(y+10, 0, 0));
-	    		}
-
-	    		for (uint8_t x = 0; x<240 ; x++) {
-	    			ST7789_DrawLine(120, 120, x, 239, RGB565(0, x+10, 0));
-	    		}
-
-	    		for (uint8_t y = 0; y<240 ; y++) {
-	    			ST7789_DrawLine(120, 120, 0, y, RGB565(0, 0, y+10));
-	    		}
-
-	    		for (uint8_t x = 0; x<240 ; x++) {
-	    			ST7789_DrawLine(120, 120, x, 0, RGB565(x+10, x+10, x+10));
-	    		}
-	    	osDelay(300);
-
-	        ST7789_FillScreen(BLACK);
-	        ST7789_SetBL(100);
-
-	        for (uint8_t x = 0; x < 240 ; x = x + 20) {
-	    			for (uint8_t y = 0; y < 240; y = y + 20) {
-	    				ST7789_DrawRectangleFilled(x + 3, y + 3, x + 17, y + 17, RGB565(x, y, 0));
-	    				ST7789_DrawRectangle(x + 2, y + 2, x + 19, y + 19, RGB565(250, 250, 250));
-	    			}
-	    		}
-	        osDelay(300);
-
-	        ST7789_FillScreen(BLACK);
-	        ST7789_SetBL(100);
-
-	        for (uint8_t x = 0; x < 240 ; x = x + 20) {
-	    			for (uint8_t y = 0; y < 240; y = y + 20) {
-	            ST7789_DrawCircleFilled(x + 10, y + 10, 8, RGB565(x, y, 0));
-	            ST7789_DrawCircle(x + 10, y + 10, 9, RGB565(0, y, x));
-	    			}
-	    		}
-	        osDelay(300);
-
-	        ST7789_FillScreen(BLACK);
-	        ST7789_SetBL(100);
-}
-
-void disp_test (void){
-	uint16_t color = RGB565(0, 255, 255);
-	ST7789_DrawCircle(80, 80, 30, color);
-
-	color = RGB565(255, 255, 255);
-	ST7789_DrawLine(80, 80, 150, 200, color);
-
-	color = RGB565(055, 120, 255);
-	ST7789_DrawRectangleFilled(20, 20, 45, 45, color);
-
-	color = RGB565(200, 120, 255);
-	ST7789_DrawCircleFilled(40, 150, 20, color);
-
-	color = RGB565(0, 0, 0);
-	ST7789_DrawChar_5x8 (40, 150, '#', color);
-
-	color = RGB565(255, 255, 255);
-	//char str[] = {"Test text 1 2 3 4 5 6 7 8 9 10 11 12"};
-	ST7789_DrawString_5x8 (0, 210, "Test text 5x8 pix",  color);
-
-	color = RGB565(255, 10, 10);
-	ST7789_DrawChar_10x16 (180, 10, '3', color);
-	ST7789_DrawString_10x16 (0, 220, "Test text 10x16 pix 0123456789", color);
-}
+//void test_display_demo (void){
+//	//    ST7789_Init(240, 240);
+//	    	  // Инициализация входа для кнопки
+//	        // Тест вывода основных цветов
+//	        //ST7789_FillScreen(BLACK);
+//	        ST7789_SetBL(100);
+//
+//	        uint16_t color = RGB565(255, 0, 0);
+//	        ST7789_FillScreen(color);
+//	        osDelay(200); //HAL_Delay(500);
+//
+//	        color = RGB565(0, 255, 0);
+//	        ST7789_FillScreen(color);
+//	        osDelay(200);
+//
+//	        color = RGB565(50, 55, 50);
+//	        ST7789_FillScreen(color);
+//	        osDelay(200);
+//
+//	        color = RGB565(0, 0, 255);
+//	        ST7789_FillScreen(color);
+//	        osDelay(200);
+//
+//	        color = RGB565(255, 255, 0);
+//	        ST7789_FillScreen(color);
+//	        osDelay(200);
+//
+//	        color = RGB565(255, 0, 255);
+//	        ST7789_FillScreen(color);
+//	        osDelay(200);
+//
+//	        color = RGB565(0, 255, 255);
+//	        ST7789_FillScreen(color);
+//	        osDelay(200);
+//
+//	        color = RGB565(255, 255, 255);
+//	        ST7789_FillScreen(color);
+//	        osDelay(200);
+//
+//	        ST7789_FillScreen(BLACK);
+//	        ST7789_SetBL(100);
+//
+//	    		for (uint8_t y = 0; y<240 ; y++) {
+//	    			ST7789_DrawLine(120, 120, 239, y, RGB565(y+10, 0, 0));
+//	    		}
+//
+//	    		for (uint8_t x = 0; x<240 ; x++) {
+//	    			ST7789_DrawLine(120, 120, x, 239, RGB565(0, x+10, 0));
+//	    		}
+//
+//	    		for (uint8_t y = 0; y<240 ; y++) {
+//	    			ST7789_DrawLine(120, 120, 0, y, RGB565(0, 0, y+10));
+//	    		}
+//
+//	    		for (uint8_t x = 0; x<240 ; x++) {
+//	    			ST7789_DrawLine(120, 120, x, 0, RGB565(x+10, x+10, x+10));
+//	    		}
+//	    	osDelay(300);
+//
+//	        ST7789_FillScreen(BLACK);
+//	        ST7789_SetBL(100);
+//
+//	        for (uint8_t x = 0; x < 240 ; x = x + 20) {
+//	    			for (uint8_t y = 0; y < 240; y = y + 20) {
+//	    				ST7789_DrawRectangleFilled(x + 3, y + 3, x + 17, y + 17, RGB565(x, y, 0));
+//	    				ST7789_DrawRectangle(x + 2, y + 2, x + 19, y + 19, RGB565(250, 250, 250));
+//	    			}
+//	    		}
+//	        osDelay(300);
+//
+//	        ST7789_FillScreen(BLACK);
+//	        ST7789_SetBL(100);
+//
+//	        for (uint8_t x = 0; x < 240 ; x = x + 20) {
+//	    			for (uint8_t y = 0; y < 240; y = y + 20) {
+//	            ST7789_DrawCircleFilled(x + 10, y + 10, 8, RGB565(x, y, 0));
+//	            ST7789_DrawCircle(x + 10, y + 10, 9, RGB565(0, y, x));
+//	    			}
+//	    		}
+//	        osDelay(300);
+//
+//	        ST7789_FillScreen(BLACK);
+//	        ST7789_SetBL(100);
+//}
+//
+//void disp_test (void){
+//	uint16_t color = RGB565(0, 255, 255);
+//	ST7789_DrawCircle(80, 80, 30, color);
+//
+//	color = RGB565(255, 255, 255);
+//	ST7789_DrawLine(80, 80, 150, 200, color);
+//
+//	color = RGB565(055, 120, 255);
+//	ST7789_DrawRectangleFilled(20, 20, 45, 45, color);
+//
+//	color = RGB565(200, 120, 255);
+//	ST7789_DrawCircleFilled(40, 150, 20, color);
+//
+//	color = RGB565(0, 0, 0);
+//	ST7789_DrawChar_5x8 (40, 150, '#', color);
+//
+//	color = RGB565(255, 255, 255);
+//	//char str[] = {"Test text 1 2 3 4 5 6 7 8 9 10 11 12"};
+//	ST7789_DrawString_5x8 (0, 210, "Test text 5x8 pix",  color);
+//
+//	color = RGB565(255, 10, 10);
+//	ST7789_DrawChar_10x16 (180, 10, '3', color);
+//	ST7789_DrawString_10x16 (0, 220, "Test text 10x16 pix 0123456789", color);
+//}
 
 
 //=========================== text 5x8 ===================================================

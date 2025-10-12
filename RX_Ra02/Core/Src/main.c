@@ -107,7 +107,7 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   ST7789_Init(240, 240);
-
+  power_on_displayed ();
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -478,10 +478,9 @@ void StartDefaultTask(void const * argument)
   {
     osDelay(1);
 
-    disp_test ();
-    osDelay(2000);
-//    test_display_demo ();
 
+    shutdown_displayed ();
+    encoder_test ();
 
   }
   /* USER CODE END 5 */
