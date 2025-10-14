@@ -9,7 +9,7 @@
 #include "display.h"
 #include <st7789.h>
 #include "main.h"
-
+#include "fram.h"
 
 void power_on_displayed (void){
 	uint16_t color;
@@ -77,7 +77,7 @@ void shutdown_displayed (void){
 		++ i;
 	}
 
-	if (i > filter){											// button power pressed and checked
+	if (i > filter  &&  !HAL_GPIO_ReadPin(pow_button_GPIO_Port, pow_button_Pin) ){											// button power pressed and checked
 		ST7789_FillScreen(BLACK);
 		color = RGB565(0, 255, 0);
 		ST7789_DrawString_10x16 (85, 25, "SHUTDOWN", color);
@@ -165,10 +165,8 @@ void encoder_test (void){
 		ST7789_DrawString_10x16 (20, 45, "Encoder not engaged", WHITE);
 		triger = 0;
 
+		fm24cl04_presence ();
+
 	}
-
-
-
-
 
 }

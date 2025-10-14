@@ -108,6 +108,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   ST7789_Init(240, 240);
   power_on_displayed ();
+
+  //fm24cl04_presence ();
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -257,6 +259,7 @@ static void MX_I2C1_Init(void)
 {
 
   /* USER CODE BEGIN I2C1_Init 0 */
+	__HAL_RCC_I2C1_CLK_ENABLE();
 
   /* USER CODE END I2C1_Init 0 */
 
@@ -476,11 +479,12 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
 
-
+    osDelay(1000);
     shutdown_displayed ();
-    encoder_test ();
+    read_fram_into_terminal ();
+    dev_i2c_presence ();
+    //encoder_test ();
 
   }
   /* USER CODE END 5 */
