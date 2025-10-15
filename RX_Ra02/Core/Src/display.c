@@ -59,6 +59,7 @@ void power_on_displayed (void){
 		ST7789_DrawRectangleFilled(80, 110, 168, 132, BLACK);
 		ST7789_DrawString_10x16 (85, 112, "SHUTDOWN", RED);
 		HAL_Delay(1000);
+		ST7789_FillScreen(BLACK);
 		HAL_GPIO_WritePin(pow_hold_GPIO_Port, pow_hold_Pin, GPIO_PIN_SET);   // power hold - disabled
 	}
 }

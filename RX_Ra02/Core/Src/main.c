@@ -108,8 +108,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   ST7789_Init(240, 240);
   power_on_displayed ();
-
-  //fm24cl04_presence ();
+  write_fram_count_init ();
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -130,7 +129,7 @@ int main(void)
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 512);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -479,11 +478,10 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-
     osDelay(1000);
+    write_fram_count_time_on();
     shutdown_displayed ();
-    read_fram_into_terminal ();
-    dev_i2c_presence ();
+    displayed_t_h ();
     //encoder_test ();
 
   }
