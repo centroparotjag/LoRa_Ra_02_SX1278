@@ -205,19 +205,20 @@ static void ST7789_RowSet(uint16_t RowStart, uint16_t RowEnd)
   ST7789_SendData(RowEnd & 0xFF);
 }
 
+extern TIM_HandleTypeDef htim4;
+
+
 void ST7789_SetBL(uint8_t Value)
 {
-  if (Value > 100)
-    Value = 100;
+  if (Value > 100){
+	Value = 100;
+  }
 
-#if (ST77xx_BLK_PWM_Used)
-  //tmr2_PWM_set(ST77xx_PWM_TMR2_Chan, Value);
-#else
-  if (Value)
-		HAL_GPIO_WritePin(blk_IPS_GPIO_Port, blk_IPS_Pin, GPIO_PIN_SET);
-  else
-		HAL_GPIO_WritePin(blk_IPS_GPIO_Port, blk_IPS_Pin, GPIO_PIN_RESET);
-#endif
+  if (Value < 1){
+	Value = 1;
+  }
+    uint16_t compare = Value * 40;
+  __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, compare);
 }
 
 void ST7789_DisplayPower(uint8_t On)

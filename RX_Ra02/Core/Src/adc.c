@@ -76,7 +76,7 @@ uint8_t displayed_adc_measurement_full (void){
 		ST7789_DrawString_10x16 (10, 35, "Low battery voltage!!!", RED);
 
 		ST7789_DrawString_10x16 (5, 70, pBuff, RED);
-	}s
+	}
 	else{
 		ST7789_DrawString_10x16 (5, 70, pBuff, BLACK);
 		ST7789_DrawRectangleFilled(0, 0, 240, 61, BLACK);
