@@ -10,6 +10,7 @@
 #include <st7789.h>
 #include "main.h"
 #include "fram.h"
+#include "adc.h"
 
 void power_on_displayed (void){
 	uint16_t color;
@@ -69,6 +70,8 @@ void shutdown_displayed (void){
 
 	uint16_t i = 0;
 	uint16_t filter = 200;
+
+	battery_check_low_voltage ();
 
 	while ( i <= filter) {
 		if (HAL_GPIO_ReadPin(pow_button_GPIO_Port, pow_button_Pin)){			 // check power button state

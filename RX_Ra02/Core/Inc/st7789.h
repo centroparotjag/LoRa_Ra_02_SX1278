@@ -60,7 +60,6 @@
 #define YELLOW   0xFFE0
 #define WHITE    0xFFFF
 
-// Ñìåùåíèå ìàòðèöû îòíîñèòåëüíî ñòðîê/ñòîëáöîâ êîíòðîëëåðà
 #define ST7789_X_Start          0
 #define ST7789_Y_Start          0
 
