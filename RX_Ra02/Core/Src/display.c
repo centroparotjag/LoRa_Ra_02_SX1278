@@ -11,6 +11,7 @@
 #include "main.h"
 #include "fram.h"
 #include "adc.h"
+#include "Flash_W25Q64.h"
 
 void power_on_displayed (void){
 	uint16_t color;
@@ -135,6 +136,60 @@ void shutdown_displayed (void){
 		}
 	}
 }
+
+
+uint8_t displaying_images_from_flash (void){
+	uint8_t data [72]={0};
+	uint8_t x = 0;
+	uint16_t color;
+	uint8_t count_PX = 0;
+
+	uint32_t addr_image_on_flash = 0x02A335;
+
+	if(!signature_and_data_search ()){
+		return 0;		// images not found
+	}
+
+//	for (uint8_t y = 0; y < 240; ++y){
+//		x=0;
+//		for (uint8_t i = 0; i < 10; ++i){
+//
+//				read_data_flash_W25Q64 (addr_image_on_flash, data, 72);
+//				addr_image_on_flash+=72;
+//
+//				count_PX = 0;
+//				for (uint8_t px = 0; px < 24; ++px){
+//					color = RGB565(data [count_PX+2], data [count_PX+1], data [count_PX]);
+//					ST7789_DrawPixel(x,  y, color);
+//					++x;
+//					count_PX+=3;
+//				}
+//
+//		}
+//	}
+
+	for (uint8_t y = 0; y < 240; ++y){
+		x=239;
+		for (uint8_t i = 0; i < 10; ++i){
+
+			read_data_flash_W25Q64 (addr_image_on_flash-72, data, 72);
+			addr_image_on_flash-=72;
+			count_PX = 71;
+
+			for (uint8_t px = 0; px < 24; ++px){
+				color = RGB565(data [count_PX-2], data [count_PX], data [count_PX-1]);
+				ST7789_DrawPixel(x,  y, color);
+				--x;
+				count_PX-=3;
+			}
+		}
+
+	}
+
+	return 1;
+}
+
+
 
 //--------------- test -------------------
 uint8_t triger = 1;

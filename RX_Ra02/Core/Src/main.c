@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "st7789.h"
+#include "Flash_W25Q64.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -118,7 +119,8 @@ int main(void)
   write_fram_count_init ();
   convert_adc_3ch ();
   SHT30_heater (0);
-  ST7789_SetBL(0);
+  displaying_images_from_flash ();
+  HAL_Delay(5000);
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -335,7 +337,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi1.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -409,7 +411,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 0;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 4096;		//65535;
+  htim4.Init.Period = 4096;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)
@@ -554,10 +556,6 @@ static void MX_GPIO_Init(void)
   * @retval None
   */
 /* USER CODE END Header_StartDefaultTask */
-
-uint8_t PWM = 0;			// test
-uint8_t DES = 0;			// test
-
 void StartDefaultTask(void const * argument)
 {
   /* init code for USB_DEVICE */
@@ -573,23 +571,6 @@ void StartDefaultTask(void const * argument)
     //encoder_test ();
     convert_adc_3ch ();
     displayed_adc_measurement_full ();
-
-    //------------- test ------------
-    if(DES == 0){
-    	PWM+=5;
-    	if(PWM>=50) {
-    		DES = 1;
-    		PWM = 50;
-    	}
-    }
-    else {
-    	PWM-=5;
-    	if(PWM==0) {
-    		DES = 0;
-    	}
-    }
-    ST7789_SetBL(PWM);
-    //----------------------------
 
 
   }

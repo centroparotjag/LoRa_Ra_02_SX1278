@@ -30,7 +30,7 @@ void ST7789_Init(uint8_t Width, uint8_t Height)
   ST7789_InversionMode(1);
   HAL_Delay(10);
   ST7789_FillScreen(0);
-  ST7789_SetBL(10);
+  ST7789_SetBL(100);
   ST7789_DisplayPower(1);
   HAL_Delay(150);
 }
@@ -214,10 +214,12 @@ void ST7789_SetBL(uint8_t Value)
 	Value = 100;
   }
 
-  if (Value < 1){
-	Value = 1;
+  uint16_t compare = Value * 40;
+
+  if (Value = 0){
+	  compare = 10;
   }
-    uint16_t compare = Value * 40;
+
   __HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, compare);
 }
 
