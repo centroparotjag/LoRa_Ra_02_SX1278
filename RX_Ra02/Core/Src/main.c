@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "st7789.h"
 #include "Flash_W25Q64.h"
+#include "Ra_02_LORA.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -55,7 +56,11 @@ TIM_HandleTypeDef htim4;
 
 osThreadId defaultTaskHandle;
 /* USER CODE BEGIN PV */
-
+LoRa myLoRa;
+uint8_t LoRa_stat=0;
+uint8_t RxBuffer[128];
+uint8_t TxBuffer[128];
+int			RSSI;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -120,6 +125,33 @@ int main(void)
   convert_adc_3ch ();
   SHT30_heater (0);
   displaying_images_from_flash ();
+
+  // MODULE SETTINGS ----------------------------------------------
+  myLoRa = newLoRa();
+
+	myLoRa.hSPIx        = &hspi2;
+	myLoRa.CS_port      = cs_Ra02_GPIO_Port;
+	myLoRa.CS_pin       = cs_Ra02_Pin;
+	myLoRa.reset_port   = res_Ra02_GPIO_Port;
+	myLoRa.reset_pin    = res_Ra02_Pin;
+	myLoRa.DIO0_port	= DIO0_GPIO_Port;
+	myLoRa.DIO0_pin		= DIO0_Pin;
+
+	myLoRa.frequency             = 440;			// default = 433 MHz
+	myLoRa.spredingFactor        = SF_7;		// default = SF_7
+	myLoRa.bandWidth			 = BW_31_25KHz;	// default = BW_125KHz
+	myLoRa.crcRate				 = CR_4_5;		// default = CR_4_5
+	myLoRa.power				 = POWER_20db;	// default = 20db
+	myLoRa.overCurrentProtection = 130; 		// default = 100 mA
+	myLoRa.preamble				 = 9;		  	// default = 8;
+
+
+	if(LoRa_init(&myLoRa)==LORA_OK){
+		LoRa_stat = 1;
+	}
+
+	// START CONTINUOUS RECEIVING -----------------------------------
+	LoRa_startReceiving(&myLoRa);
 
   /* USER CODE END 2 */
 
@@ -478,10 +510,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(adc_cir_0V_GPIO_Port, adc_cir_0V_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOA, adc_cir_0V_Pin|res_Ra02_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, res_IPS_Pin|res_Ra02_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(res_IPS_GPIO_Port, res_IPS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, dc_IPS_Pin|pow_hold_Pin|cs_Ra02_Pin|cs_flash_Pin, GPIO_PIN_SET);
@@ -521,6 +553,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(pow_hold_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : DIO0_Pin */
+  GPIO_InitStruct.Pin = DIO0_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(DIO0_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : cs_Ra02_Pin cs_flash_Pin */
   GPIO_InitStruct.Pin = cs_Ra02_Pin|cs_flash_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
@@ -547,6 +585,13 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+//Receiver Side
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	if(GPIO_Pin == myLoRa.DIO0_pin){
+		LoRa_receive(&myLoRa, RxBuffer, 128);
+	}
+}
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -571,6 +616,9 @@ void StartDefaultTask(void const * argument)
 	osDelay(1000);
 	write_fram_count_time_on();
 	shutdown_displayed ();
+	if(Ra_02_pressence (&myLoRa)) {
+		displaying_images_from_flash ();
+	}
   }
   /* USER CODE END 5 */
 }

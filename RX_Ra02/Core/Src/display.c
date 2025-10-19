@@ -186,6 +186,7 @@ void encoder_test (void){
 		while (!HAL_GPIO_ReadPin(enc_up_GPIO_Port, enc_up_Pin));
 		triger = 1;
 
+
 	}
 
 	if (!HAL_GPIO_ReadPin(enc_button_GPIO_Port, enc_button_Pin)){

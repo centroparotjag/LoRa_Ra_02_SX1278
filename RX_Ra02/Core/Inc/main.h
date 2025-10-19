@@ -75,6 +75,8 @@ void Error_Handler(void);
 #define dc_IPS_GPIO_Port GPIOB
 #define pow_hold_Pin GPIO_PIN_1
 #define pow_hold_GPIO_Port GPIOB
+#define DIO0_Pin GPIO_PIN_2
+#define DIO0_GPIO_Port GPIOB
 #define cs_Ra02_Pin GPIO_PIN_12
 #define cs_Ra02_GPIO_Port GPIOB
 #define cs_flash_Pin GPIO_PIN_13
