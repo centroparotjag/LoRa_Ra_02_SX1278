@@ -16,7 +16,6 @@ void write_fram_count_init (void);
 uint32_t read_fram_count_time_on (void);
 void write_fram_count_time_on(void);
 
-uint8_t fm24cl04_presence (void);
 void read_fram_into_terminal (void);
 void fram_erase_full (void);
 

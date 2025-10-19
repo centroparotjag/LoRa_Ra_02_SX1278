@@ -9,10 +9,36 @@
 #include <stdlib.h>
 #include "main.h"
 #include "Flash_W25Q64.h"
+#include "display.h"
+#include <st7789.h>
 
 
 extern SPI_HandleTypeDef hspi2;
 
+
+uint8_t flash_W25Q64_pressence (void){
+	uint8_t instr = 0x9F;		//JEDEC ID - 0x9F
+	uint8_t buff [3] = {0x9F};
+
+	HAL_GPIO_WritePin(cs_flash_GPIO_Port, cs_flash_Pin, GPIO_PIN_RESET); 	// SC W25Q64 - enabled
+	HAL_SPI_Transmit(&hspi2, &instr,  1, 100);								//JEDEC ID - 0x9F
+	HAL_SPI_Receive (&hspi2, buff, 3, 100);
+	HAL_GPIO_WritePin(cs_flash_GPIO_Port, cs_flash_Pin, GPIO_PIN_SET); 	// SC W25Q64 - disabled
+
+
+	//---------- debug test -----------------------
+//	char pBuff [32];
+//	sprintf(pBuff, "JEDEC ID 0x%02X%02X%02X", buff [0], buff [1], buff [2]);
+//	ST7789_DrawString_10x16_background  (5, 10, pBuff, GREEN, BLACK);
+	//-----------------------------------------------
+
+
+	if(buff [1] == 0x40 && buff [2]== 0x17){
+		return 1;		// W25Q64_pressence - OK
+	}
+
+	return 0;
+}
 
 void read_data_flash_W25Q64 (uint32_t addr, uint8_t* data, uint8_t Size){
 

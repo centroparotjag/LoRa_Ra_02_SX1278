@@ -566,4 +566,41 @@ void ST7789_DrawString_10x16 (int16_t x0, int16_t y0, char * str, uint16_t color
   }
 }
 
+//-----
+void ST7789_DrawChar_10x16_background (int16_t x0, int16_t y0, char character, uint16_t color, uint16_t background_color)
+{
+	int pix = 0x01;
+	int sym = character - 0x20;
+	for (int16_t X= 0; X < 10; ++X) {
+		pix = 0x01;
+		for (int16_t Y= 0; Y < 8; ++Y) {
+			if ( FONT_terminal_10x15[sym][X*2] & pix ) {
+				ST7789_DrawPixel(X + x0, Y + y0, color);
+			}
+			else {
+				ST7789_DrawPixel(X + x0, Y + y0, background_color);
+			}
+			pix = pix << 1;
+		}
+		pix = 0x01;
+		for (int16_t Y= 0; Y < 8; ++Y) {
+			if ( FONT_terminal_10x15[sym][X*2+1] & pix ) {
+				ST7789_DrawPixel(X + x0, Y + 8 + y0, color);
+			}
+			else {
+				ST7789_DrawPixel(X + x0, Y + 8 + y0, background_color);
+			}
+			pix = pix << 1;
+		}
+	}
+}
+
+void ST7789_DrawString_10x16_background (int16_t x0, int16_t y0, char * str, uint16_t color, uint16_t background_color)
+{
+  uint16_t i = 0;
+  while (str[i] != '\0' && i<=24) {
+	  ST7789_DrawChar_10x16_background  ( x0+(10*i), y0, str[i], color, background_color);
+	  i++;
+  }
+}
 

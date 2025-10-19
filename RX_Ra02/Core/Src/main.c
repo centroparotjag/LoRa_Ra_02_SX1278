@@ -120,7 +120,7 @@ int main(void)
   convert_adc_3ch ();
   SHT30_heater (0);
   displaying_images_from_flash ();
-  HAL_Delay(5000);
+
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -564,15 +564,13 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1000);
-    write_fram_count_time_on();
-    shutdown_displayed ();
     //displayed_t_h ();
     //encoder_test ();
     convert_adc_3ch ();
     displayed_adc_measurement_full ();
-
-
+	osDelay(1000);
+	write_fram_count_time_on();
+	shutdown_displayed ();
   }
   /* USER CODE END 5 */
 }

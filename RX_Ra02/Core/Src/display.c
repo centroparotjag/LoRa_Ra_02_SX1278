@@ -143,31 +143,14 @@ uint8_t displaying_images_from_flash (void){
 	uint8_t x = 0;
 	uint16_t color;
 	uint8_t count_PX = 0;
-
 	uint32_t addr_image_on_flash = 0x02A335;
 
+	//------- Search for signatures and image headers .BMP on a flash drive ----------
 	if(!signature_and_data_search ()){
 		return 0;		// images not found
 	}
 
-//	for (uint8_t y = 0; y < 240; ++y){
-//		x=0;
-//		for (uint8_t i = 0; i < 10; ++i){
-//
-//				read_data_flash_W25Q64 (addr_image_on_flash, data, 72);
-//				addr_image_on_flash+=72;
-//
-//				count_PX = 0;
-//				for (uint8_t px = 0; px < 24; ++px){
-//					color = RGB565(data [count_PX+2], data [count_PX+1], data [count_PX]);
-//					ST7789_DrawPixel(x,  y, color);
-//					++x;
-//					count_PX+=3;
-//				}
-//
-//		}
-//	}
-
+	//---------- Displaying an image from a flash drive to the display ---------------
 	for (uint8_t y = 0; y < 240; ++y){
 		x=239;
 		for (uint8_t i = 0; i < 10; ++i){
@@ -185,8 +168,10 @@ uint8_t displaying_images_from_flash (void){
 		}
 
 	}
-
-	return 1;
+	//--------------------------------------------------------------------------------
+	HAL_Delay(1000);
+	ST7789_FillScreen(BLACK);
+	return 1;				// Everything is done well.
 }
 
 
@@ -223,9 +208,6 @@ void encoder_test (void){
 		ST7789_FillScreen(BLACK);
 		ST7789_DrawString_10x16 (20, 45, "Encoder not engaged", WHITE);
 		triger = 0;
-
-		fm24cl04_presence ();
-
 	}
 
 }

@@ -64,51 +64,44 @@ uint8_t displayed_adc_measurement_full (void){
 	temp -= 273.15f;
 	//-------------------------------------------
 	char pBuff [32];
-	uint16_t color;
 
 	//----------------------------------------
-	color = RGB565(204, 255, 255);
-	ST7789_DrawRectangleFilled(0, 65, 239, 90, color);
+	ST7789_DrawRectangle(0, 65, 239, 90, YELLOW);
 	sprintf(pBuff, "U(bat) = %.3f V", Ubat);
 	if(Ubat<=BATT_LOW_VOLTAGE+0.1){
 		ST7789_DrawRectangle(0, 0, 239, 60, RED);
 		ST7789_DrawString_10x16 (35, 10, "!!! WARNING !!!", RED);
 		ST7789_DrawString_10x16 (10, 35, "Low battery voltage!!!", RED);
 
-		ST7789_DrawString_10x16 (5, 70, pBuff, RED);
+		ST7789_DrawString_10x16_background  (5, 70, pBuff, RED, BLACK);
 	}
 	else{
-		ST7789_DrawString_10x16 (5, 70, pBuff, BLACK);
+		ST7789_DrawString_10x16_background (5, 70, pBuff, GREEN, BLACK);
 		ST7789_DrawRectangleFilled(0, 0, 240, 61, BLACK);
 	}
 
 	//----------------------------------------
-	color = RGB565(255, 255, 0);
-	ST7789_DrawRectangleFilled(0, 95, 239, 120, color);
+	ST7789_DrawRectangle(0, 95, 239, 120, YELLOW);
 	sprintf(pBuff, "U(3v3) = %.3f V", U33);
-	ST7789_DrawString_10x16 (5, 100, pBuff, BLUE);
+	ST7789_DrawString_10x16_background  (5, 100, pBuff, GREEN, BLACK);
 
 	//----------------------------------------
-	color = RGB565(128, 128, 0);
-	ST7789_DrawRectangleFilled(0, 125, 239, 170, color);
-
+	ST7789_DrawRectangle(0, 125, 239, 170, YELLOW);
 	sprintf(pBuff, "R NTC  = %.1f Ohm", rntc);
-	ST7789_DrawString_10x16 (5, 130, pBuff, CYAN);
+	ST7789_DrawString_10x16_background (5, 130, pBuff, CYAN, BLACK);
 	sprintf(pBuff, "T NTC  = %.1f C", temp);
-	ST7789_DrawString_10x16 (5, 150, pBuff, CYAN);
+	ST7789_DrawString_10x16_background (5, 150, pBuff, CYAN, BLACK);
 
 	//-----------------------------------------------
-	color = RGB565(150, 150, 150);
-
-	ST7789_DrawRectangleFilled(0, 175, 239, 239, color);
-	ST7789_DrawString_10x16 (5, 180, "ADC meas:", WHITE);
-	ST7789_DrawString_10x16 (95, 180, "AN0 Ref:", WHITE);
-	ST7789_DrawString_10x16 (95, 200, "AN1 NTC:", WHITE);
-	ST7789_DrawString_10x16 (95, 220, "AN2 BAT:", WHITE);
+	ST7789_DrawRectangle(0, 175, 239, 239, YELLOW);
+	ST7789_DrawString_10x16_background  (5, 180, "ADC meas", WHITE, BLACK);
+	ST7789_DrawString_10x16_background  (95, 180, "AN0 Ref", WHITE, BLACK);
+	ST7789_DrawString_10x16_background  (95, 200, "AN1 NTC", WHITE, BLACK);
+	ST7789_DrawString_10x16_background  (95, 220, "AN2 BAT", WHITE, BLACK);
 
 	for (uint8_t i = 0; i<3; ++i){
 		sprintf(pBuff, "0x%04X", adcData[i]);
-		ST7789_DrawString_10x16 (173, 180 + (i*20), pBuff, WHITE);
+		ST7789_DrawString_10x16_background (172, 180 + (i*20), pBuff, WHITE, BLACK);
 	}
 	//----------------------------------------------------
 	return 0;
