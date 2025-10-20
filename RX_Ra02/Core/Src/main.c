@@ -26,6 +26,7 @@
 #include "st7789.h"
 #include "Flash_W25Q64.h"
 #include "Ra_02_LORA.h"
+#include "other functions.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,6 +62,7 @@ uint8_t LoRa_stat=0;
 uint8_t RxBuffer[128];
 uint8_t TxBuffer[128];
 int			RSSI;
+uint8_t dev_LoRa = 0;		//Ra_02_pressence (&myLoRa);
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -124,7 +126,7 @@ int main(void)
   write_fram_count_init ();
   convert_adc_3ch ();
   SHT30_heater (0);
-  displaying_images_from_flash ();
+  display_of_device_presence_at_startup ();
 
   // MODULE SETTINGS ----------------------------------------------
   myLoRa = newLoRa();
@@ -407,7 +409,7 @@ static void MX_SPI2_Init(void)
   hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -616,9 +618,7 @@ void StartDefaultTask(void const * argument)
 	osDelay(1000);
 	write_fram_count_time_on();
 	shutdown_displayed ();
-	if(Ra_02_pressence (&myLoRa)) {
-		displaying_images_from_flash ();
-	}
+
   }
   /* USER CODE END 5 */
 }

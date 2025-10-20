@@ -63,15 +63,11 @@ void write_fram_count_time_on(void){
 
 //---------------------------------------------------------------------------
 
-
-
-
-
 uint8_t dev_i2c_presence (void){
 	uint8_t state = 0;
-	state = HAL_I2C_IsDeviceReady (& hi2c1, FRAM_i2c_addrr, 2, 100) == 0  ?  (state | 0x01) : state ;
-	state = HAL_I2C_IsDeviceReady (& hi2c1,   RTC_i2c_addr, 2, 100) == 0  ?  (state | 0x02) : state ;
-	state = HAL_I2C_IsDeviceReady (& hi2c1, SHT30_i2c_addr, 2, 100) == 0  ?  (state | 0x04) : state ;
+	state |= HAL_I2C_IsDeviceReady (& hi2c1, FRAM_i2c_addrr, 2, 100) == 0  ?  (state | 0x01) : state ;
+	state |= HAL_I2C_IsDeviceReady (& hi2c1,   RTC_i2c_addr, 2, 100) == 0  ?  (state | 0x02) : state ;
+	state |= HAL_I2C_IsDeviceReady (& hi2c1, SHT30_i2c_addr, 2, 100) == 0  ?  (state | 0x04) : state ;
 	return state;
 }
 

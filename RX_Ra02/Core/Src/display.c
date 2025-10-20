@@ -170,7 +170,7 @@ uint8_t displaying_images_from_flash (void){
 	}
 	//--------------------------------------------------------------------------------
 	HAL_Delay(1000);
-	ST7789_FillScreen(BLACK);
+	//ST7789_FillScreen(BLACK);
 	return 1;				// Everything is done well.
 }
 
