@@ -27,6 +27,7 @@
 #include "Flash_W25Q64.h"
 #include "Ra_02_LORA.h"
 #include "other functions.h"
+#include "DS3231.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,6 +57,7 @@ SPI_HandleTypeDef hspi2;
 TIM_HandleTypeDef htim4;
 
 osThreadId defaultTaskHandle;
+osThreadId myTask_BUTTONHandle;
 /* USER CODE BEGIN PV */
 LoRa myLoRa;
 uint8_t LoRa_stat=0;
@@ -63,6 +65,8 @@ uint8_t RxBuffer[128];
 uint8_t TxBuffer[128];
 int			RSSI;
 uint8_t dev_LoRa = 0;		//Ra_02_pressence (&myLoRa);
+uint16_t background_color = 0;
+extern uint8_t MENU_update;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,6 +79,7 @@ static void MX_SPI2_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM4_Init(void);
 void StartDefaultTask(void const * argument);
+void StartTask_BUTTON(void const * argument);
 
 /* USER CODE BEGIN PFP */
 
@@ -126,7 +131,8 @@ int main(void)
   write_fram_count_init ();
   convert_adc_3ch ();
   SHT30_heater (0);
-  display_of_device_presence_at_startup ();
+
+
 
   // MODULE SETTINGS ----------------------------------------------
   myLoRa = newLoRa();
@@ -155,6 +161,7 @@ int main(void)
 	// START CONTINUOUS RECEIVING -----------------------------------
 	LoRa_startReceiving(&myLoRa);
 
+	display_of_device_presence_at_startup ();
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -177,6 +184,10 @@ int main(void)
   /* definition and creation of defaultTask */
   osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 512);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+
+  /* definition and creation of myTask_BUTTON */
+  osThreadDef(myTask_BUTTON, StartTask_BUTTON, osPriorityBelowNormal, 0, 512);
+  myTask_BUTTONHandle = osThreadCreate(osThread(myTask_BUTTON), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -409,7 +420,7 @@ static void MX_SPI2_Init(void)
   hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -611,16 +622,62 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-    //displayed_t_h ();
-    //encoder_test ();
-    convert_adc_3ch ();
-    displayed_adc_measurement_full ();
-	osDelay(1000);
-	write_fram_count_time_on();
-	shutdown_displayed ();
+	osDelay(955);
+    read_data_time_DS3231 (background_color);
 
   }
   /* USER CODE END 5 */
+}
+
+/* USER CODE BEGIN Header_StartTask_BUTTON */
+/**
+* @brief Function implementing the myTask_BUTTON thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartTask_BUTTON */
+uint8_t m_counter = 0;
+void StartTask_BUTTON(void const * argument)
+{
+  /* USER CODE BEGIN StartTask_BUTTON */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(100);
+    buttons ();
+    MENU_SELEKTOR ();
+    shutdown_displayed ();
+
+    if(m_counter > 100) {
+    	MENU_update = 1;
+    	m_counter = 0;
+    }
+    m_counter ++;
+
+  }
+  /* USER CODE END StartTask_BUTTON */
+}
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM2 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM2)
+  {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
 }
 
 /**

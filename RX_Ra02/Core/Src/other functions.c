@@ -13,18 +13,18 @@
 #include <st7789.h>
 #include "main.h"
 #include "Ra_02_LORA.h"
+#include <stdio.h>
+#include <time.h>
 
 extern myLoRa;
 extern float Ubat;
-extern uint8_t count_adc_limit;
 
 void display_of_device_presence_at_startup (void){
 	HAL_GPIO_WritePin(pow_hold_GPIO_Port, pow_hold_Pin, GPIO_PIN_RESET); // power hold - enabled
 	displaying_images_from_flash ();
-	count_adc_limit = 0;
 	convert_adc_3ch ();
 
-	uint8_t dev_LoRa = 1;		//Ra_02_pressence (&myLoRa);
+	uint8_t dev_LoRa = Ra_02_pressence (&myLoRa);
 	uint8_t flash = flash_W25Q64_pressence ();
 	uint8_t dev_i2c = dev_i2c_presence ();
 
@@ -86,4 +86,76 @@ void display_of_device_presence_at_startup (void){
 	}
 	HAL_Delay(1000);
 	ST7789_FillScreen(BLACK);
+}
+
+
+void data_time_compile_prj (void){
+
+    char buff [24] = {0};
+    sprintf(buff,"%s at %s  ", __DATE__, __TIME__);
+    ST7789_DrawString_10x16_background(0, 40, buff, GREEN, BLACK);
+}
+
+//---------------- buttons --------------------------
+extern uint8_t MENU_update;
+extern uint8_t state_but;
+
+void buttons (void){
+	uint8_t filter = 255;
+
+
+	//------------ UP ------------------------------
+	if (!HAL_GPIO_ReadPin(enc_up_GPIO_Port, enc_up_Pin) && state_but == 0){
+		for (uint16_t i=0; i<filter; ++i) {
+			if (HAL_GPIO_ReadPin(enc_up_GPIO_Port, enc_up_Pin)){
+				break;
+			}
+			else {
+				state_but = 1;
+				MENU_update = 1;
+			}
+		}
+
+
+	}
+
+	//------------ PUSH ------------------------------
+	if (!HAL_GPIO_ReadPin(enc_button_GPIO_Port, enc_button_Pin) && state_but == 0){
+		for (uint16_t i=0; i<filter; ++i) {
+			if (HAL_GPIO_ReadPin(enc_button_GPIO_Port, enc_button_Pin)){
+				break;
+			}
+			else {
+				state_but = 2;
+				MENU_update = 1;
+			}
+		}
+	}
+
+	//------------ DOWN ------------------------------
+	if (!HAL_GPIO_ReadPin(enc_down_GPIO_Port, enc_down_Pin) && state_but == 0){
+		for (uint16_t i=0; i<filter; ++i) {
+			if (HAL_GPIO_ReadPin(enc_down_GPIO_Port, enc_down_Pin)){
+				break;
+			}
+			else {
+				state_but = 3;
+				MENU_update = 1;
+			}
+		}
+	}
+
+
+
+	if (HAL_GPIO_ReadPin(enc_up_GPIO_Port, enc_up_Pin) && HAL_GPIO_ReadPin(enc_button_GPIO_Port, enc_button_Pin)  &&
+		HAL_GPIO_ReadPin(enc_down_GPIO_Port, enc_down_Pin) ){
+		state_but = 0;
+	}
+
+//	char b[34];
+//	sprintf (b , "state_but%d", state_but);
+//	ST7789_DrawString_10x16_background(10, 200, b, WHITE, BLACK);
+
+
+
 }

@@ -18,23 +18,14 @@
 
 
 extern ADC_HandleTypeDef hadc1;
-uint8_t count_adc_limit = 0;
 uint16_t adcData[ADC_CHANNELS_NUM];
 float U33  = 3.3;
 float Ubat = 4.2;
 
 void convert_adc_3ch (void){
-
-	if (count_adc_limit == 0 || count_adc_limit%10 == 0){
 		HAL_GPIO_WritePin(adc_cir_0V_GPIO_Port, adc_cir_0V_Pin, GPIO_PIN_RESET);		// enable 0V on circuit ADC
-		HAL_Delay(50);
+		HAL_Delay(25);
 		HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adcData, ADC_CHANNELS_NUM);
-		count_adc_limit = 1;
-	}
-	else {
-		count_adc_limit++;
-	}
-
 }
 
 
@@ -77,7 +68,7 @@ uint8_t displayed_adc_measurement_full (void){
 	}
 	else{
 		ST7789_DrawString_10x16_background (5, 70, pBuff, GREEN, BLACK);
-		ST7789_DrawRectangleFilled(0, 0, 240, 61, BLACK);
+		//ST7789_DrawRectangleFilled(0, 0, 240, 61, BLACK);
 	}
 
 	//----------------------------------------
@@ -120,7 +111,6 @@ uint8_t battery_check_low_voltage (void){
 			ST7789_DrawRectangleFilled(140, 70, 220, 90, RED);
 			ST7789_DrawString_10x16 (20, 70, pBuff, YELLOW);
 			ST7789_DrawString_10x16 (50, 110, "SHUTDOWN AFTER", YELLOW);
-			count_adc_limit = 0;
 			convert_adc_3ch ();
 			sprintf(pBuff, "%d", s-i);
 			ST7789_DrawRectangleFilled(115, 150, 135, 170, RED);

@@ -1,0 +1,82 @@
+/*
+ * DS3231.c
+ *
+ *  Created on: Oct 20, 2025
+ *      Author: centr
+ */
+
+#include "stm32f4xx_hal.h"
+#include "DS3231.h"
+#include "config.h"
+#include "display.h"
+#include <st7789.h>
+#include "main.h"
+#include "other functions.h"
+#include "adc.h"
+#include "fram.h"
+#include <stdio.h>
+
+extern I2C_HandleTypeDef hi2c1;
+
+void read_data_time_DS3231 (uint16_t background_color){
+
+	uint8_t pData[19] = {0};
+	uint8_t s = 0;
+	uint8_t m = 0;
+	uint8_t H = 0;
+	uint8_t w = 0;
+	uint8_t d = 0;
+	uint8_t M = 0;
+	uint8_t Y = 0;
+
+
+	HAL_I2C_Mem_Read(& hi2c1, RTC_i2c_addr, 0x00, 1, pData, 7, 100);
+	Y = ((pData[6] & 0xF0)>>4)*10 + (pData[6] & 0x0F);
+
+	if ( Y < 24 ){
+		uint8_t b[8] = {0x00, 0x00, 0x42, 0x19, 0x01, 0x20, 0x10, 0x25};
+		HAL_I2C_Master_Transmit(& hi2c1, RTC_i2c_addr, b, 8, 100);
+		HAL_Delay(10);
+		HAL_I2C_Mem_Read(& hi2c1, RTC_i2c_addr, 0x00, 1, pData, 7, 100);
+	}
+
+	s = ((pData[0] & 0xF0)>>4)*10 + (pData[0] & 0x0F);
+	m = ((pData[1] & 0xF0)>>4)*10 + (pData[1] & 0x0F);
+	H = ((pData[2] & 0x30)>>4)*10 + (pData[2] & 0x0F);
+	w =  pData[3];
+	d = ((pData[4] & 0xF0)>>4)*10 + (pData[4] & 0x0F);
+	M = ((pData[5] & 0x10)>>4)*10 + (pData[5] & 0x0F);
+	Y = ((pData[6] & 0xF0)>>4)*10 + (pData[6] & 0x0F);
+
+	char buff  [8] = {0};
+
+	if (s == 0) {
+		write_fram_count_time_on();
+	}
+
+	if (s%10 == 0){
+		convert_adc_3ch ();
+	}
+
+	sprintf (buff, "%02d.%02d.%02d  %02d:%02d:%02d", d, M, Y, H, m, s);
+	ST7789_DrawString_10x16_background(50, 2, buff, YELLOW, background_color);
+
+	switch (w) {
+		case 1: ST7789_DrawString_10x16_background(20, 2, "Mo", YELLOW, background_color);
+			break;
+		case 2: ST7789_DrawString_10x16_background(20, 2, "Tu", YELLOW, background_color);
+			break;
+		case 3: ST7789_DrawString_10x16_background(20, 2, "We", YELLOW, background_color);
+			break;
+		case 4: ST7789_DrawString_10x16_background(20, 2, "Th", YELLOW, background_color);
+			break;
+		case 5: ST7789_DrawString_10x16_background(20, 2, "Fr", YELLOW, background_color);
+			break;
+		case 6: ST7789_DrawString_10x16_background(20, 2, "Sa", YELLOW, background_color);
+			break;
+		case 7: ST7789_DrawString_10x16_background(20, 2, "Su", RED, background_color);
+			break;
+	}
+
+
+}

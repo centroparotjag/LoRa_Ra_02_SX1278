@@ -9,5 +9,7 @@
 #define INC_OTHER_FUNCTIONS_H_
 
 void display_of_device_presence_at_startup (void);
+void data_time_compile_prj (void);
+void buttons (void);
 
 #endif /* INC_OTHER_FUNCTIONS_H_ */
