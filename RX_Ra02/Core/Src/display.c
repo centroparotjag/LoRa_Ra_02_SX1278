@@ -13,6 +13,9 @@
 #include "adc.h"
 #include "Flash_W25Q64.h"
 
+extern uint8_t RTC_view;
+extern uint16_t background_color;
+
 void power_on_displayed (void){
 	uint16_t color;
 
@@ -83,6 +86,7 @@ void shutdown_displayed (void){
 	}
 
 	if (i > filter  &&  !HAL_GPIO_ReadPin(pow_button_GPIO_Port, pow_button_Pin) ){											// button power pressed and checked
+		RTC_view = 0;
 		ST7789_FillScreen(BLACK);
 		color = RGB565(0, 255, 0);
 		ST7789_DrawString_10x16 (85, 25, "SHUTDOWN", color);
@@ -150,6 +154,8 @@ uint8_t displaying_images_from_flash (void){
 		return 0;		// images not found
 	}
 
+	//ST7789_FillScreen(background_color);
+
 	//---------- Displaying an image from a flash drive to the display ---------------
 	for (uint8_t y = 0; y < 240; ++y){
 		x=239;
@@ -169,7 +175,7 @@ uint8_t displaying_images_from_flash (void){
 
 	}
 	//--------------------------------------------------------------------------------
-	HAL_Delay(1000);
+	//HAL_Delay(1000);
 	//ST7789_FillScreen(BLACK);
 	return 1;				// Everything is done well.
 }

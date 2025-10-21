@@ -18,7 +18,7 @@
 
 extern I2C_HandleTypeDef hi2c1;
 
-void read_data_time_DS3231 (uint16_t background_color){
+void read_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 
 	uint8_t pData[19] = {0};
 	uint8_t s = 0;
@@ -58,25 +58,25 @@ void read_data_time_DS3231 (uint16_t background_color){
 		convert_adc_3ch ();
 	}
 
-	sprintf (buff, "%02d.%02d.%02d  %02d:%02d:%02d", d, M, Y, H, m, s);
-	ST7789_DrawString_10x16_background(50, 2, buff, YELLOW, background_color);
+	if (displayed == 1){
+		sprintf (buff, "%02d.%02d.%02d  %02d:%02d:%02d", d, M, Y, H, m, s);
+		ST7789_DrawString_10x16_background(50, 2, buff, YELLOW, background_color);
 
-	switch (w) {
-		case 1: ST7789_DrawString_10x16_background(20, 2, "Mo", YELLOW, background_color);
-			break;
-		case 2: ST7789_DrawString_10x16_background(20, 2, "Tu", YELLOW, background_color);
-			break;
-		case 3: ST7789_DrawString_10x16_background(20, 2, "We", YELLOW, background_color);
-			break;
-		case 4: ST7789_DrawString_10x16_background(20, 2, "Th", YELLOW, background_color);
-			break;
-		case 5: ST7789_DrawString_10x16_background(20, 2, "Fr", YELLOW, background_color);
-			break;
-		case 6: ST7789_DrawString_10x16_background(20, 2, "Sa", YELLOW, background_color);
-			break;
-		case 7: ST7789_DrawString_10x16_background(20, 2, "Su", RED, background_color);
-			break;
+		switch (w) {
+			case 1: ST7789_DrawString_10x16_background(15, 2, "Mo", YELLOW, background_color);
+				break;
+			case 2: ST7789_DrawString_10x16_background(15, 2, "Tu", YELLOW, background_color);
+				break;
+			case 3: ST7789_DrawString_10x16_background(15, 2, "We", YELLOW, background_color);
+				break;
+			case 4: ST7789_DrawString_10x16_background(15, 2, "Th", YELLOW, background_color);
+				break;
+			case 5: ST7789_DrawString_10x16_background(15, 2, "Fr", YELLOW, background_color);
+				break;
+			case 6: ST7789_DrawString_10x16_background(15, 2, "Sa", YELLOW, background_color);
+				break;
+			case 7: ST7789_DrawString_10x16_background(15, 2, "Su", RED, background_color);
+				break;
+		}
 	}
-
-
 }

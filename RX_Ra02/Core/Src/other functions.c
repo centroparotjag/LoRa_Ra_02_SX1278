@@ -89,20 +89,22 @@ void display_of_device_presence_at_startup (void){
 }
 
 
-void data_time_compile_prj (void){
-
-    char buff [24] = {0};
-    sprintf(buff,"%s at %s  ", __DATE__, __TIME__);
-    ST7789_DrawString_10x16_background(0, 40, buff, GREEN, BLACK);
-}
-
 //---------------- buttons --------------------------
 extern uint8_t MENU_update;
 extern uint8_t state_but;
+extern uint8_t MENU;
+extern uint8_t MENU_stage;
+
+uint16_t inactivity_counter = 0;
 
 void buttons (void){
 	uint8_t filter = 255;
 
+	if (state_but>0){
+		state_but = 0xFF;
+	}
+
+	inactivity_counter++;
 
 	//------------ UP ------------------------------
 	if (!HAL_GPIO_ReadPin(enc_up_GPIO_Port, enc_up_Pin) && state_but == 0){
@@ -113,9 +115,9 @@ void buttons (void){
 			else {
 				state_but = 1;
 				MENU_update = 1;
+				inactivity_counter = 0;
 			}
 		}
-
 
 	}
 
@@ -128,6 +130,7 @@ void buttons (void){
 			else {
 				state_but = 2;
 				MENU_update = 1;
+				inactivity_counter = 0;
 			}
 		}
 	}
@@ -141,6 +144,7 @@ void buttons (void){
 			else {
 				state_but = 3;
 				MENU_update = 1;
+				inactivity_counter = 0;
 			}
 		}
 	}
@@ -156,6 +160,23 @@ void buttons (void){
 //	sprintf (b , "state_but%d", state_but);
 //	ST7789_DrawString_10x16_background(10, 200, b, WHITE, BLACK);
 
+//----auto-return to the main menu when inactive ----
+	if (inactivity_counter >= 600){
+		inactivity_counter = 0xFF00;
+		if ( MENU != 0){
+				MENU = 0;
+				MENU_update = 1;
+				MENU_stage = 0;
+				state_but = 0x08;
+			}
+	}
 
+
+	if ( MENU == 0 && state_but == 2){
+		MENU = 1;
+		MENU_update = 1;
+		MENU_stage = 0;
+		state_but = 0x08;
+	}
 
 }

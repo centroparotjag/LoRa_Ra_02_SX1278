@@ -17,7 +17,8 @@
 
 
 extern I2C_HandleTypeDef hi2c1;
-
+extern uint8_t MENU_stage;
+extern uint8_t RTC_view;
 
 // Function to calculate CRC-8/NRSC-5
 uint8_t calculate_crc8_nrsc5(const uint8_t *data, size_t length) {
@@ -120,27 +121,31 @@ uint8_t mesurement_t_h_SHT30 (float* temperature, float* humidity){
 	return 1;
 }
 
+extern uint16_t background_color;
+
 void displayed_t_h (void){
 	float temperature =0;
 	float humidity = 0;
 	uint8_t crc_status = mesurement_t_h_SHT30 (& temperature, & humidity);
+	background_color = RGB565(70,130,180);
+
+	if(MENU_stage == 0){
+		MENU_stage = 1;
+		ST7789_FillScreen(background_color);
+		ST7789_DrawLine(0, 25, 239, 25, YELLOW);
+	}
+
 
 	char buff [24] = {0};
-
-	sprintf (buff, "T = %.2f" , temperature);
-	ST7789_DrawRectangleFilled(40, 0, 100, 60, BLACK);
-	ST7789_DrawString_10x16 (0, 0, buff, RED);
-
-	sprintf (buff, "h = %.2f" , humidity);
-	ST7789_DrawString_10x16 (0, 20, buff, RED);
-
+	sprintf (buff, "T = %.2f  h = %.2f   " , temperature, humidity);
+	ST7789_DrawString_10x16_background(5, 45, buff, GREEN, background_color);
 
 
 	if (crc_status) {
-		ST7789_DrawString_10x16 (0, 40, "CRC OK", GREEN);
+		ST7789_DrawString_10x16_background (5, 65, "CRC OK     ", GREEN, background_color);
 	}
 	else {
-		ST7789_DrawString_10x16 (0, 40, "CRC - ERROR", RED);
+		ST7789_DrawString_10x16_background (5, 65, "CRC - ERROR", RED, background_color);
 	}
 
 	//--------------- reg status --------------------------
@@ -155,32 +160,31 @@ void displayed_t_h (void){
 
 
 	char pBuff [20];
-	ST7789_DrawString_10x16 (0, 70, "Status register SHT30", CYAN);
+	ST7789_DrawString_10x16 (5, 85, "Status register SHT30", CYAN);
 
-	ST7789_DrawRectangle(0, 95, 239, 223, CYAN);
-	ST7789_DrawRectangle(1, 96, 238, 222, CYAN);
-	ST7789_DrawRectangleFilled(228, 97, 237, 218, BLACK);
+	ST7789_DrawRectangle(0, 111, 239, 239, CYAN);
+	ST7789_DrawRectangle(1, 110, 238, 238, CYAN);
 
 	sprintf(pBuff, "Alert pending [15] = %d", Alert_pending_15r);
-	ST7789_DrawString_10x16 (10, 100, pBuff, MAGENTA);
+	ST7789_DrawString_10x16_background (10, 115, pBuff, MAGENTA, background_color);
 
 	sprintf(pBuff, "Heater        [13] = %d", Heater_13r);
-	ST7789_DrawString_10x16 (10, 120, pBuff, MAGENTA);
+	ST7789_DrawString_10x16_background (10, 135, pBuff, MAGENTA, background_color);
 
 	sprintf(pBuff, "RH alert      [10] = %d", RH_alert_10r);
-	ST7789_DrawString_10x16 (10, 140, pBuff, MAGENTA);
+	ST7789_DrawString_10x16_background (10, 155, pBuff, MAGENTA, background_color);
 
 	sprintf(pBuff, "System reset   [4] = %d", System_reset_4r);
-	ST7789_DrawString_10x16 (10, 160, pBuff, MAGENTA);
+	ST7789_DrawString_10x16_background (10, 175, pBuff, MAGENTA, background_color);
 
 	sprintf(pBuff, "Command status [1] = %d", Command_status_1r);
-	ST7789_DrawString_10x16 (10, 180, pBuff, MAGENTA);
+	ST7789_DrawString_10x16_background (10, 195, pBuff, MAGENTA, background_color);
 
 	sprintf(pBuff, "checksum status[0] = %d", checksum_status_0r);
-	ST7789_DrawString_10x16 (10, 200, pBuff, MAGENTA);
+	ST7789_DrawString_10x16_background (10, 215, pBuff, MAGENTA, background_color);
 
 
-
+	RTC_view = 1;
 
 }
 

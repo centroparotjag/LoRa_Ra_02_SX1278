@@ -67,6 +67,8 @@ int			RSSI;
 uint8_t dev_LoRa = 0;		//Ra_02_pressence (&myLoRa);
 uint16_t background_color = 0;
 extern uint8_t MENU_update;
+uint8_t RTC_view = 1;
+uint8_t m_counter = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -186,7 +188,7 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of myTask_BUTTON */
-  osThreadDef(myTask_BUTTON, StartTask_BUTTON, osPriorityBelowNormal, 0, 512);
+  osThreadDef(myTask_BUTTON, StartTask_BUTTON, osPriorityAboveNormal, 0, 512);
   myTask_BUTTONHandle = osThreadCreate(osThread(myTask_BUTTON), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -623,7 +625,7 @@ void StartDefaultTask(void const * argument)
   for(;;)
   {
 	osDelay(955);
-    read_data_time_DS3231 (background_color);
+    read_data_time_DS3231 (background_color, RTC_view);
 
   }
   /* USER CODE END 5 */
@@ -636,7 +638,6 @@ void StartDefaultTask(void const * argument)
 * @retval None
 */
 /* USER CODE END Header_StartTask_BUTTON */
-uint8_t m_counter = 0;
 void StartTask_BUTTON(void const * argument)
 {
   /* USER CODE BEGIN StartTask_BUTTON */
