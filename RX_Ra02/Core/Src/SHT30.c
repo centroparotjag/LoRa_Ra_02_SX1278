@@ -127,7 +127,7 @@ void displayed_t_h (void){
 	float temperature =0;
 	float humidity = 0;
 	uint8_t crc_status = mesurement_t_h_SHT30 (& temperature, & humidity);
-	background_color = RGB565(70,130,180);
+	background_color = RGB565(95,158,160);
 
 	if(MENU_stage == 0){
 		MENU_stage = 1;

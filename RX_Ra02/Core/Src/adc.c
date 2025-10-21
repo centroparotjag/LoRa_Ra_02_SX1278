@@ -44,7 +44,7 @@ uint8_t displayed_adc_measurement_full (void){
 	HAL_GPIO_WritePin(pow_hold_GPIO_Port, pow_hold_Pin, GPIO_PIN_RESET);		// power on
 	convert_adc_3ch ();
 	HAL_Delay(5);
-	background_color = RGB565(0,0,112);
+	background_color = RGB565(105,105,105);
 	//-------- NTC 100k-+1% B3950 ----------------
 	float Ur100k = (U33 * adcData[1])/4096;
 	float rntc   = ((U33/Ur100k)-1)*R100k;

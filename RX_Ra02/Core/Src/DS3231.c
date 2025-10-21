@@ -80,3 +80,20 @@ void read_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 		}
 	}
 }
+
+void Write_time_to_RTC (uint8_t DayWeek, uint8_t Day, uint8_t Month, uint8_t Year, uint8_t Hours, uint8_t min, uint8_t sec ){
+
+	uint8_t data[8] = {0};
+
+	data[0] = 0x00;		// num register
+	data[1] = sec;
+	data[2] = min;
+	data[3] = Hours;
+	data[4] = DayWeek;
+	data[5] = Day;
+	data[6] = Month;
+	data[7] = Year;
+
+	HAL_I2C_Master_Transmit(& hi2c1, RTC_i2c_addr, data, 8, 100);
+
+}

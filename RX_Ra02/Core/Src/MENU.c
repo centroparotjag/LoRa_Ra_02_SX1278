@@ -82,7 +82,7 @@ void MENU_SET (void){
 
 	if (MENU_stage == 0){
 		MENU_stage = 1;
-		uint16_t color = RGB565(25,25,112);
+		uint16_t color = RGB565(85,107,47);
 		background_color = color;
 		ST7789_FillScreen(color);
 		ST7789_DrawLine(0, 22, 240, 22, YELLOW);
@@ -132,30 +132,30 @@ void MENU_SET (void){
 		//----  kursor ---------
 		if (m_set == 0) {
 			ST7789_DrawRectangleFilled(10, 45, 20, 55, RED);
-			ST7789_DrawRectangleFilled(10, 56, 20, 180, BLUE);
+			ST7789_DrawRectangleFilled(10, 56, 20, 180, background_color);
 		}
 		if (m_set == 1) {
-			ST7789_DrawRectangleFilled(10, 45, 20, 69, BLUE);
+			ST7789_DrawRectangleFilled(10, 45, 20, 69, background_color);
 			ST7789_DrawRectangleFilled(10, 70, 20, 80, RED);
-			ST7789_DrawRectangleFilled(10, 81, 20, 180, BLUE);
+			ST7789_DrawRectangleFilled(10, 81, 20, 180, background_color);
 		}
 		if (m_set == 2) {
-			ST7789_DrawRectangleFilled(10, 45, 20, 94, BLUE);
+			ST7789_DrawRectangleFilled(10, 45, 20, 94, background_color);
 			ST7789_DrawRectangleFilled(10, 95, 20, 105, RED);
-			ST7789_DrawRectangleFilled(10, 106, 20, 180, BLUE);
+			ST7789_DrawRectangleFilled(10, 106, 20, 180, background_color);
 		}
 		if (m_set == 3) {
-			ST7789_DrawRectangleFilled(10, 45, 20, 119, BLUE);
+			ST7789_DrawRectangleFilled(10, 45, 20, 119, background_color);
 			ST7789_DrawRectangleFilled(10, 120, 20, 130, RED);
-			ST7789_DrawRectangleFilled(10, 131, 20, 180, BLUE);
+			ST7789_DrawRectangleFilled(10, 131, 20, 180, background_color);
 		}
 		if (m_set == 4) {
-			ST7789_DrawRectangleFilled(10, 45, 20, 144, BLUE);
+			ST7789_DrawRectangleFilled(10, 45, 20, 144, background_color);
 			ST7789_DrawRectangleFilled(10, 145, 20, 155, RED);
-			ST7789_DrawRectangleFilled(10, 156, 20, 180, BLUE);
+			ST7789_DrawRectangleFilled(10, 156, 20, 180, background_color);
 		}
 		if (m_set == 5) {
-			ST7789_DrawRectangleFilled(10, 45, 20, 169, BLUE);
+			ST7789_DrawRectangleFilled(10, 45, 20, 169, background_color);
 			ST7789_DrawRectangleFilled(10, 170, 20, 180, RED);
 		}
 	}
@@ -195,6 +195,7 @@ void MENU_RTC (void){
 	background_color = RGB565(80,110,34);
 
 	if(MENU_stage == 0){
+		//Write_time_to_RTC (0x02, 0x21, 0x10, 0x25, 0x22, 0x42, 0x10);		// test BCD format
 		MENU_stage = 1;
 		ST7789_FillScreen(background_color);
 		ST7789_DrawLine(0, 25, 239, 25, YELLOW);

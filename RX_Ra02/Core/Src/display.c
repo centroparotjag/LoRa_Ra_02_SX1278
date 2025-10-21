@@ -15,6 +15,8 @@
 
 extern uint8_t RTC_view;
 extern uint16_t background_color;
+extern uint8_t MENU_update;
+extern uint8_t MENU_stage;
 
 void power_on_displayed (void){
 	uint16_t color;
@@ -137,6 +139,8 @@ void shutdown_displayed (void){
 			ST7789_DrawString_10x16 (90, 112, "Return.", RED);
 			HAL_Delay(1000);
 			ST7789_FillScreen(BLACK);
+			MENU_update = 1;
+			MENU_stage = 0;
 		}
 	}
 }
