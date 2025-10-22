@@ -17,7 +17,7 @@
 #include "fram.h"
 #include <stdio.h>
 
-uint8_t MENU = 0;
+uint8_t MENU = 4;
 uint8_t MENU_update = 1;
 uint8_t MENU_stage = 0;
 extern uint8_t state_but = 0;
@@ -62,6 +62,7 @@ void MENU_SELEKTOR (void){
     	}
     	if (MENU == 5){			// TIMESET
     		RTC_view = 1;
+    		//fram_erase_full ();			//test
     		MENU_RTC ();
     	}
     	if (MENU == 6){			// DISPLAY
@@ -178,16 +179,74 @@ void MENU_O (void){
 }
 
 void MENU_STAT (void){
+	uint32_t h=0;
+	uint32_t m=0;
+	char buff [24];
 
-	background_color = RGB565(34,100,80);
+	background_color = RGB565(34, 100, 80);
+	uint16_t main_color = RGB565(32,178,170);
+	uint16_t outline_color = RGB565(255,255,255);
 
 	if(MENU_stage == 0){
 		MENU_stage = 1;
 		ST7789_FillScreen(background_color);
-		ST7789_DrawLine(0, 25, 239, 25, YELLOW);
+
+		//-------------CIRKLE GRAFIC -----------------
+		uint16_t grafic_color = RGB565(60,179,113);
+		ST7789_DrawCircleFilled(120, 126, 90, grafic_color);
+		ST7789_DrawCircleFilled(120, 126, 80, background_color);
+		ST7789_DrawCircleFilled(120, 126, 70, grafic_color);
+		ST7789_DrawCircleFilled(120, 126, 60, background_color);
+		ST7789_DrawCircleFilled(120, 126, 50, grafic_color);
+		ST7789_DrawCircleFilled(120, 126, 40, background_color);
+		//----------------- TIME ----------------------------
+		ST7789_DrawLine(0, 24, 239, 24, outline_color);
+		ST7789_DrawLine(0, 25, 239, 25, outline_color);
+		ST7789_DrawLine(0, 26, 239, 26, outline_color);
+		//-----------------------------------------------
+
+		ST7789_DrawRectangleFilled(0, 35, 239, 85, main_color);
+		ST7789_DrawRectangle(0, 35, 239, 85, outline_color);
+		ST7789_DrawString_10x16_background(40, 40, "POWER-ON COUNTER", WHITE, main_color);
+
+		ST7789_DrawRectangleFilled(0, 100, 239, 150, main_color);
+		ST7789_DrawRectangle(0, 100, 239, 150, outline_color);
+		ST7789_DrawString_10x16_background(50, 105, "WORKING TIMES", WHITE, main_color);
+
+		ST7789_DrawRectangleFilled(0, 165, 239, 239, main_color);
+		ST7789_DrawRectangle(0, 165, 239, 239, outline_color);
+		ST7789_DrawString_10x16_background(100, 170, "FRAM", WHITE, main_color);
 	}
 
-	ST7789_DrawString_10x16_background(50, 120, "MENU STAT", WHITE, background_color);
+
+	uint32_t power_on_counter = read_fram_count_init ();
+	uint32_t working_times    = read_fram_count_time_on ();
+
+	h = working_times / 60;
+	m = working_times%60;
+
+	//-------------------------------------------------------------------------
+	sprintf (buff, "%d", power_on_counter);
+	int8_t Xc=120;
+	if(power_on_counter >= 10000 && power_on_counter < 100000 ){ Xc=80; }
+	if(power_on_counter >= 100000 ){ Xc=50; }
+
+	ST7789_DrawString_10x16_background(Xc, 60, buff, YELLOW, main_color);
+
+	sprintf (buff, "%dh %02dm", h, m);
+	int8_t Xh=90;
+	if(h >= 1000  && h < 10000 ){ Xh=70; }
+	if(h >= 10000 && h < 100000 ){ Xc=60; }
+	if(h > 100000 ){ Xc=50; }
+
+	ST7789_DrawString_10x16_background(Xh, 125, buff, YELLOW, main_color);
+	//-------------------------------------------------------------------------
+	sprintf (buff, "p.o.c. 0x%08X", power_on_counter);
+	ST7789_DrawString_10x16_background(30, 190, buff, WHITE, main_color);
+
+	sprintf (buff, "w.t.   0x%08X", working_times);
+	ST7789_DrawString_10x16_background(30, 210, buff, WHITE, main_color);
+
 }
 
 void MENU_RTC (void){
