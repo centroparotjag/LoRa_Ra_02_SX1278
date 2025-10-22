@@ -28,6 +28,12 @@
 #include "Ra_02_LORA.h"
 #include "other functions.h"
 #include "DS3231.h"
+#include "adc.h"
+#include "MENU.h"
+#include "display.h"
+#include "SHT30.h"
+#include "Ra_02_LORA.h"
+#include "fram.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,7 +74,6 @@ uint8_t dev_LoRa = 0;		//Ra_02_pressence (&myLoRa);
 uint16_t background_color = 0;
 extern uint8_t MENU_update;
 uint8_t RTC_view = 1;
-uint8_t m_counter = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -648,14 +653,7 @@ void StartTask_BUTTON(void const * argument)
     buttons ();
     MENU_SELEKTOR ();
     shutdown_displayed ();
-
-    if(m_counter > 100) {
-    	MENU_update = 1;
-    	m_counter = 0;
-    }
-    m_counter ++;
-
-  }
+}
   /* USER CODE END StartTask_BUTTON */
 }
 

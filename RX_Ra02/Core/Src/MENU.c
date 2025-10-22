@@ -17,10 +17,11 @@
 #include "fram.h"
 #include <stdio.h>
 
-uint8_t MENU = 4;
+uint8_t MENU = 0;
 uint8_t MENU_update = 1;
 uint8_t MENU_stage = 0;
-extern uint8_t state_but = 0;
+uint8_t state_but = 0;
+uint8_t m_set = 0;
 extern uint16_t background_color;
 extern uint8_t RTC_view;
 extern uint8_t m_counter;
@@ -35,6 +36,16 @@ void MENU_SELEKTOR (void){
 		MENU_stage = 0;
 		state_but = 8;
 	}
+
+
+	if (state_but == 0x02 && MENU == 1 && m_set == 0) {
+		MENU = 0;
+		MENU_update = 1;
+		MENU_stage = 0;
+		state_but = 8;
+	}
+
+
 
     if(MENU_update == 1){
 
@@ -78,7 +89,7 @@ void MENU_SELEKTOR (void){
 
 
 //=========== SELEKTOR MENU 1  ===========================
-uint8_t m_set = 0;
+
 void MENU_SET (void){
 
 	if (MENU_stage == 0){
@@ -118,7 +129,6 @@ void MENU_SET (void){
 	if (state_but == 0x02) {
 		if (m_set == 0){
 			MENU = 0;
-			m_counter = 100;
 		}
 		else {
 			MENU = m_set+1;
@@ -131,33 +141,25 @@ void MENU_SET (void){
 	}
 	else {
 		//----  kursor ---------
+		ST7789_DrawRectangleFilled(10, 45, 20, 180, background_color);
+		uint16_t cursor_color = RGB565(0,255,0);
 		if (m_set == 0) {
-			ST7789_DrawRectangleFilled(10, 45, 20, 55, RED);
-			ST7789_DrawRectangleFilled(10, 56, 20, 180, background_color);
+			ST7789_DrawRectangleFilled(10, 45, 20, 55, cursor_color);
 		}
 		if (m_set == 1) {
-			ST7789_DrawRectangleFilled(10, 45, 20, 69, background_color);
-			ST7789_DrawRectangleFilled(10, 70, 20, 80, RED);
-			ST7789_DrawRectangleFilled(10, 81, 20, 180, background_color);
+			ST7789_DrawRectangleFilled(10, 70, 20, 80, cursor_color);
 		}
 		if (m_set == 2) {
-			ST7789_DrawRectangleFilled(10, 45, 20, 94, background_color);
-			ST7789_DrawRectangleFilled(10, 95, 20, 105, RED);
-			ST7789_DrawRectangleFilled(10, 106, 20, 180, background_color);
+			ST7789_DrawRectangleFilled(10, 95, 20, 105, cursor_color);
 		}
 		if (m_set == 3) {
-			ST7789_DrawRectangleFilled(10, 45, 20, 119, background_color);
-			ST7789_DrawRectangleFilled(10, 120, 20, 130, RED);
-			ST7789_DrawRectangleFilled(10, 131, 20, 180, background_color);
+			ST7789_DrawRectangleFilled(10, 120, 20, 130, cursor_color);
 		}
 		if (m_set == 4) {
-			ST7789_DrawRectangleFilled(10, 45, 20, 144, background_color);
-			ST7789_DrawRectangleFilled(10, 145, 20, 155, RED);
-			ST7789_DrawRectangleFilled(10, 156, 20, 180, background_color);
+			ST7789_DrawRectangleFilled(10, 145, 20, 155, cursor_color);
 		}
 		if (m_set == 5) {
-			ST7789_DrawRectangleFilled(10, 45, 20, 169, background_color);
-			ST7789_DrawRectangleFilled(10, 170, 20, 180, RED);
+			ST7789_DrawRectangleFilled(10, 170, 20, 180, cursor_color);
 		}
 	}
 	RTC_view = 1;
@@ -173,9 +175,12 @@ void MENU_O (void){
 		MENU_stage = 1;
 		ST7789_FillScreen(background_color);
 		ST7789_DrawLine(0, 25, 239, 25, YELLOW);
+
+		uint16_t c_color = RGB565(60,165,60);
+		ST7789_DrawString_10x16_background(90, 120, "MENU 0", c_color, background_color);
 	}
 
-	ST7789_DrawString_10x16_background(50, 120, "MENU 0", WHITE, background_color);
+
 }
 
 void MENU_STAT (void){

@@ -59,11 +59,7 @@ void read_data_flash_W25Q64 (uint32_t addr, uint8_t* data, uint8_t Size){
 
 
 uint32_t signature_and_data_search (void){
-
 	uint8_t buff [24] = {0};
-	uint32_t addr=0;
-	uint16_t signature_found = 0;
-
 	read_data_flash_W25Q64 (0, buff, 24);
 
 	if (buff[0x00]=='B'  && buff[0x01] =='M'  && buff[0x0A]==0x36 &&
@@ -71,7 +67,6 @@ uint32_t signature_and_data_search (void){
 	{
 		return 1;
 	}
-
 	return 0;	// not found
 }
 

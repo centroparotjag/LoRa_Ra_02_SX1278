@@ -17,6 +17,7 @@
 #include <stdio.h>
 
 extern I2C_HandleTypeDef hi2c1;
+extern uint8_t MENU_update;
 
 void read_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 
@@ -52,10 +53,12 @@ void read_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 
 	if (s == 0) {
 		write_fram_count_time_on();
+
 	}
 
 	if (s%10 == 0){
 		convert_adc_3ch ();
+		MENU_update = 1;
 	}
 
 	if (displayed == 1){

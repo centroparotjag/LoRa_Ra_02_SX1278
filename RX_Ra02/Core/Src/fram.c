@@ -11,7 +11,7 @@
 #include "display.h"
 #include <st7789.h>
 #include "main.h"
-
+#include "usbd_cdc_if.h"
 extern I2C_HandleTypeDef hi2c1;
 
 

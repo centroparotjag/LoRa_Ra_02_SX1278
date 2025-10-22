@@ -15,6 +15,7 @@
 #include "Ra_02_LORA.h"
 #include <stdio.h>
 #include <time.h>
+#include "adc.h"
 
 extern myLoRa;
 extern float Ubat;
@@ -177,6 +178,7 @@ void buttons (void){
 		MENU_update = 1;
 		MENU_stage = 0;
 		state_but = 0x08;
+
 	}
 
 }
