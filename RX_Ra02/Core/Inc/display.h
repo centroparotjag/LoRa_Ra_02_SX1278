@@ -12,7 +12,6 @@
 
 void power_on_displayed (void);
 void shutdown_displayed (void);
-void encoder_test (void);			// test foo
 uint8_t displaying_images_from_flash (void);
 
 #endif /* INC_DISPLAY_H_ */

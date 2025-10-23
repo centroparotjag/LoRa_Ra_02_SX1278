@@ -17,7 +17,7 @@
 #include "fram.h"
 #include <stdio.h>
 
-uint8_t MENU = 5;
+uint8_t MENU = 0;
 uint8_t MENU_update = 1;
 uint8_t MENU_stage = 0;
 uint8_t state_but = 0;

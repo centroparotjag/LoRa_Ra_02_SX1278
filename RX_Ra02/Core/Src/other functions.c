@@ -164,7 +164,7 @@ void buttons (void){
 //----auto-return to the main menu when inactive ----
 	if (inactivity_counter >= 600){
 		inactivity_counter = 0xFF00;
-		if ( MENU == 1){
+		if ( MENU == 1 || MENU == 5){
 				MENU = 0;
 				MENU_update = 1;
 				MENU_stage = 0;
