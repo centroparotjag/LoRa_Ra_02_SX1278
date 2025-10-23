@@ -135,11 +135,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   ST7789_Init(240, 240);
   power_on_displayed ();
-  write_fram_count_init ();
   convert_adc_3ch ();
   SHT30_heater (0);
-
-
 
   // MODULE SETTINGS ----------------------------------------------
   myLoRa = newLoRa();
@@ -168,7 +165,7 @@ int main(void)
 	// START CONTINUOUS RECEIVING -----------------------------------
 	LoRa_startReceiving(&myLoRa);
 
-	display_of_device_presence_at_startup ();
+	//display_of_device_presence_at_startup ();
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */
@@ -630,7 +627,8 @@ void StartDefaultTask(void const * argument)
   for(;;)
   {
 	osDelay(955);
-    read_data_time_DS3231 (background_color, RTC_view);
+	displayed_data_time_DS3231 (background_color, RTC_view);
+
 
   }
   /* USER CODE END 5 */
