@@ -162,7 +162,6 @@ void MENU_SET (void){
 }
 
 
-
 void MENU_O (void){
 	background_color = RGB565(34,139,34);
 	if(MENU_stage == 0){
@@ -296,6 +295,20 @@ uint8_t convert2BCD(uint8_t hexData)
     return   bcdData;
   }
 
+
+uint8_t lim_max_day_month_leap( uint8_t MONTH, uint8_t YEAR){
+	uint8_t DAY = 31;
+	if(MONTH == 2){ // February
+		DAY = ((YEAR%4) == 0) ? 29 : 28;
+	}
+	if(MONTH == 4 || MONTH == 6 || MONTH == 9 || MONTH == 11){   // April, June, September, November
+		DAY = 30;
+	}
+	return DAY;
+}
+
+
+
 void MENU_RTC (void){
 
 	background_color = RGB565(80,110,34);
@@ -315,33 +328,22 @@ void MENU_RTC (void){
 		MENU_stage = 1;
 		state_but = 8;
 		ST7789_FillScreen(background_color);
-
 		//----------------- TIME ----------------------------
 		ST7789_DrawLine(0, 24, 239, 24, outline_color);
 		ST7789_DrawLine(0, 25, 239, 25, outline_color);
-
 		//-----------------------------------------------
-
 		ST7789_DrawRectangleFilled(0, 40, 239, 90, main_color);
 		ST7789_DrawRectangle      (0, 40, 239, 90, outline_color);
-
-
 		ST7789_DrawRectangleFilled(0, 115, 239, 165, main_color);
 		ST7789_DrawRectangle      (0, 115, 239, 165, outline_color);
-
-
 		ST7789_DrawRectangleFilled(0, 189, 239, 239, main_color);
 		ST7789_DrawRectangle      (0, 189, 239, 239, outline_color);
-
 		read_data_time_DS3231 (data);
 		DWs = data[3];	Ys = data[0];	Ms = data[1];	Ds= data[2];
 						Hs = data[4];	ms = data[5];	ss = data[6];
-
 		ST7789_DrawString_10x16_background(0,   42, "W.DAY DAY . MONTH .YEAR", legend_color, main_color);
 		ST7789_DrawString_10x16_background(50, 117, "HOURS : MIN  : SEC",      legend_color, main_color);
 		ST7789_DrawString_10x16_background(40, 205, "APPLY       EXIT",        text_color,   main_color);
-
-
 	}
 
 	//------------------ set new data time -------------------------------
@@ -350,8 +352,9 @@ void MENU_RTC (void){
 		if (state_but == 0x01) { DWs--; if (DWs == 0) {DWs = 7;} }
 	}
 	if (set_pos == 1){		// Ds
-		if (state_but == 0x03) { Ds++; if (Ds >  31) {Ds = 1;  } }
-		if (state_but == 0x01) { Ds--; if (Ds == 0)  {Ds = 31; } }
+		uint8_t D_lim = lim_max_day_month_leap(Ms, Ys);
+		if (state_but == 0x03) { Ds++; if (Ds >  D_lim) {Ds = 1;  } }
+		if (state_but == 0x01) { Ds--; if (Ds == 0)  {Ds = D_lim; } }
 	}
 	if (set_pos == 2){		// Ms
 		if (state_but == 0x03) { Ms++; if (Ms >  12) {Ms = 1;  } }
@@ -373,9 +376,6 @@ void MENU_RTC (void){
 		if (state_but == 0x03) { ss++; if (ss >  59) {ss = 0;} }
 		if (state_but == 0x01) { if (ss == 0) {ss = 59;} else {ss--;} }
 	}
-
-
-
 	//------------------- DAY WEEK-------------------------------------------
 	uint8_t x_DW = 15; uint8_t y_DW = 65;
 	switch (DWs) {
@@ -419,7 +419,6 @@ void MENU_RTC (void){
 		if (set_pos > 8) {set_pos = 0;}
 		MENU_update = 1;
 	}
-
 	//----- button push ---------------- uint8_t DWs, Ds, Ms, Ys, Hs, ms, ss = 0;
 	if (state_but == 0x02 && set_pos == 7) {			// save time -APPLY
 		uint8_t Day = convert2BCD(Ds);
@@ -434,7 +433,6 @@ void MENU_RTC (void){
 		MENU_update = 1;
 		state_but = 8;
 	}
-
 	//----- button push -----
 	if (state_but == 0x02 && set_pos == 6) {set_pos = 7; MENU_update = 1;}
 	if (state_but == 0x02 && set_pos == 5) {set_pos = 6; MENU_update = 1;}
@@ -443,13 +441,9 @@ void MENU_RTC (void){
 	if (state_but == 0x02 && set_pos == 2) {set_pos = 3; MENU_update = 1;}
 	if (state_but == 0x02 && set_pos == 1) {set_pos = 2; MENU_update = 1;}
 	if (state_but == 0x02 && set_pos == 0) {set_pos = 1; MENU_update = 1;}
-
 	//---------------------- POSITION ---------------------------------------------------
 	uint16_t set_color = RGB565(255,127,80);
 	draw_position (set_pos, set_color, main_color);
-
-
-	//MENU_update = 1;
 }
 
 

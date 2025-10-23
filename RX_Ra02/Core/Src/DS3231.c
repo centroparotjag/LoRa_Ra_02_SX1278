@@ -31,16 +31,8 @@ void displayed_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 	uint8_t M = 0;
 	uint8_t Y = 0;
 
-
 	HAL_I2C_Mem_Read(& hi2c1, RTC_i2c_addr, 0x00, 1, pData, 7, 100);
 	Y = ((pData[6] & 0xF0)>>4)*10 + (pData[6] & 0x0F);
-
-//	if ( Y < 24 ){
-//		uint8_t b[8] = {0x00, 0x00, 0x42, 0x19, 0x01, 0x20, 0x10, 0x25};
-//		HAL_I2C_Master_Transmit(& hi2c1, RTC_i2c_addr, b, 8, 100);
-//		HAL_Delay(10);
-//		HAL_I2C_Mem_Read(& hi2c1, RTC_i2c_addr, 0x00, 1, pData, 7, 100);
-//	}
 
 	s = ((pData[0] & 0xF0)>>4)*10 + (pData[0] & 0x0F);
 	m = ((pData[1] & 0xF0)>>4)*10 + (pData[1] & 0x0F);
