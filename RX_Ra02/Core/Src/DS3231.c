@@ -45,6 +45,7 @@ void displayed_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 	char buff  [8] = {0};
 
 	if (flag_once_wr_count_init == 0){
+		HAL_Delay(10);
 		write_fram_count_init ();
 		flag_once_wr_count_init = 1;
 		HAL_Delay(10);

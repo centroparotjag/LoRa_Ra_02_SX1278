@@ -13,7 +13,7 @@
 #include "main.h"
 #include "usbd_cdc_if.h"
 extern I2C_HandleTypeDef hi2c1;
-extern CRC_HandleTypeDef hcrc;
+
 
 //--------------------------------------------------------------------
 // 00 01 02 03  |  04 05 06 07   |

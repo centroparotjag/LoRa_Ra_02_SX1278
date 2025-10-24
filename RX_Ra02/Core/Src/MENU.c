@@ -28,9 +28,6 @@ extern uint8_t RTC_view;
 extern uint8_t m_counter;
 
 void MENU_SELEKTOR (void){
-
-	//if (state_but > 0 && state_but <4 ) { MENU_update = 1; }
-
 	//------------ return to MENU_SET (1) -------------
 	if (state_but == 0x02 && MENU != 0 && MENU != 1 && MENU != 5) {
 		MENU = 1;
@@ -326,8 +323,10 @@ void MENU_RTC (void){
 		state_but = 8;
 		ST7789_FillScreen(background_color);
 		//----------------- TIME ----------------------------
-		ST7789_DrawLine(0, 24, 239, 24, outline_color);
-		ST7789_DrawLine(0, 25, 239, 25, outline_color);
+
+		for(uint8_t i =0; i<5; ++i){
+			ST7789_DrawLine(0, 24+i*2, 239, 24+i*2, outline_color);
+		}
 		//-----------------------------------------------
 		ST7789_DrawRectangleFilled(0, 40, 239, 90, main_color);
 		ST7789_DrawRectangle      (0, 40, 239, 90, outline_color);

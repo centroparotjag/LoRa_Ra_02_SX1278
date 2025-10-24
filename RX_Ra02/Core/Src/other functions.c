@@ -19,6 +19,7 @@
 
 extern myLoRa;
 extern float Ubat;
+extern uint8_t m_set;
 
 void display_of_device_presence_at_startup (void){
 	HAL_GPIO_WritePin(pow_hold_GPIO_Port, pow_hold_Pin, GPIO_PIN_RESET); // power hold - enabled
@@ -169,6 +170,7 @@ void buttons (void){
 				MENU_update = 1;
 				MENU_stage = 0;
 				state_but = 0x08;
+				m_set = 0;
 			}
 	}
 
