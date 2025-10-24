@@ -186,6 +186,7 @@ void MENU_STAT (void){
 	if(MENU_stage == 0){
 		MENU_stage = 1;
 		ST7789_FillScreen(background_color);
+		//read_fram_into_terminal ();		// test!!!
 
 		//-------------CIRKLE GRAFIC -----------------
 		uint16_t grafic_color = RGB565(60,179,113);
@@ -197,7 +198,7 @@ void MENU_STAT (void){
 		ST7789_DrawCircleFilled(120, 126, 40, background_color);
 		//----------------- TIME ----------------------------
 		ST7789_DrawLine(0, 24, 239, 24, outline_color);
-		ST7789_DrawLine(0, 25, 239, 25, outline_color);
+		//ST7789_DrawLine(0, 25, 239, 25, outline_color);
 		ST7789_DrawLine(0, 26, 239, 26, outline_color);
 		//-----------------------------------------------
 
@@ -310,20 +311,16 @@ uint8_t lim_max_day_month_leap( uint8_t MONTH, uint8_t YEAR){
 
 
 void MENU_RTC (void){
-
 	background_color = RGB565(80,110,34);
 	uint16_t main_color = RGB565(60,90,24);
 	uint16_t outline_color = RGB565(20,30,10);
 	uint16_t text_color = RGB565(255,255,255);
 	uint16_t legend_color = RGB565(110,140,54);
 
-
-
 	uint8_t data[7]={0};
 	char buff [24];
 
 	if(MENU_stage == 0){
-		//Write_time_to_RTC (0x02, 0x21, 0x10, 0x25, 0x22, 0x42, 0x10);		// test BCD format
 		set_pos = 8;
 		MENU_stage = 1;
 		state_but = 8;
@@ -341,7 +338,7 @@ void MENU_RTC (void){
 		read_data_time_DS3231 (data);
 		DWs = data[3];	Ys = data[0];	Ms = data[1];	Ds= data[2];
 						Hs = data[4];	ms = data[5];	ss = data[6];
-		ST7789_DrawString_10x16_background(0,   42, "W.DAY DAY . MONTH .YEAR", legend_color, main_color);
+		ST7789_DrawString_10x16_background(3,   42, "W.DAY DAY - MONTH -YEAR", legend_color, main_color);
 		ST7789_DrawString_10x16_background(50, 117, "HOURS : MIN  : SEC",      legend_color, main_color);
 		ST7789_DrawString_10x16_background(40, 205, "APPLY       EXIT",        text_color,   main_color);
 	}
@@ -396,7 +393,7 @@ void MENU_RTC (void){
 	}
 
 	//-------------------- DATA TIME  -----------------------------------------------
-	sprintf(buff, "%02d  .  %02d  .  %02d", Ds, Ms, Ys);
+	sprintf(buff, "%02d  -  %02d  -  %02d", Ds, Ms, Ys);
 	ST7789_DrawString_10x16_background(x_DW + 50, y_DW, buff, text_color, main_color);
 
 	sprintf(buff, "%02d  :  %02d  :  %02d", Hs, ms, ss);
