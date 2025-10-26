@@ -5,3 +5,5 @@ RX_Ra02/Release/
 RX_Ra02/Drivers/
 RX_Ra02/Middlewares/
 RX_Ra02/USB_DEVICE/
+TX_Ra02/Debug/
+TX_Ra02/Release/
