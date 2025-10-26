@@ -54,7 +54,7 @@ int main(void)
 		//SHT30_0V_en(0);
 		//_delay_ms(2);		// Small delay for stabilization
 		uint8_t Th[4];
-		uint8_t check_crc = mesurement_t_h_SHT30 (&Th);
+		uint8_t check_crc = mesurement_t_h_SHT30 (Th);
 		//SHT30_0V_en(1);
 				
 		
