@@ -35,7 +35,8 @@ int main(void)
 {
 	GPIO_init();		// Initialize GPIO
 	i2c_init();			// Initialize I2C
-	SPI_MasterInit();	// Initialize SPI
+	SPI_MasterDeInit();
+	//SPI_MasterInit();	// Initialize SPI
 	uart_init();		// Initialize UART
 	_delay_ms(100);		// Small delay for stabilization    
 	
@@ -46,25 +47,30 @@ int main(void)
 	uint8_t i=1;
     while (1) 
     {
-		LED(i);	
-		_delay_ms(1000); // Small delay for stabilization  
-		i=(~i) & 0x01;
+		LED(1);	
+		POW_3V3_en(1);
+		_delay_ms(5000); // Small delay for stabilization  
+		LED(0);
+		POW_3V3_en(0);
+		_delay_ms(5000); // Small delay for stabilization
+
+
 
 
 		//SHT30_0V_en(0);
 		//_delay_ms(2);		// Small delay for stabilization
-		uint8_t Th[4];
-		uint8_t check_crc = mesurement_t_h_SHT30 (Th);
+		//uint8_t Th[4];
+		//uint8_t check_crc = mesurement_t_h_SHT30 (Th);
 		//SHT30_0V_en(1);
 				
 		
-		char buff[20] = "Hello word";
-		sprintf(buff, "t=%02X%02X h=%02X%02X crc=%d", Th[0], Th[1], Th[2], Th[3], check_crc);
-		
-		for(uint8_t i=0; i<19; ++i){
-			uart_transmit(buff[i]);
-		}
-		uart_transmit('\r');
+		//char buff[20] = "Hello word";
+		//sprintf(buff, "t=%02X%02X h=%02X%02X crc=%d", Th[0], Th[1], Th[2], Th[3], check_crc);
+		//
+		//for(uint8_t i=0; i<19; ++i){
+			//uart_transmit(buff[i]);
+		//}
+		//uart_transmit('\r');
 
     }
 }

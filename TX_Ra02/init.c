@@ -35,13 +35,13 @@ void GPIO_init(void){
 	//-----------------------------------------------------------------------------------------
 	//DDRx The Port  Data Direction Register 0 - input; / 1 - output;
 	DDRD = 0b10000100;		// PD7(LED)=output; 
-	DDRB = 0b00101111;		// PB5(CLK SPI)=output; PB3(MOSI SPI)=output; PB2(CS SPI)=output; PB1(RST Ra-02)=output; PB0-(3V3-ON)=output;
+	DDRB = 0b00000001;		// PB5(CLK SPI)=output; PB3(MOSI SPI)=output; PB2(CS SPI)=output; PB1(RST Ra-02)=output; PB0-(3V3-ON)=output;
 	DDRC = 0b01001000;		// PC7(+V SHT30)=output; PC6(0V FRAM)=output; PC3(0V ADC)=output; 
 	
 	//-----------------------------------------------------------------------------------------
 	// P-UP on unused pins (input)
-	PORTD = 0b01111111;		// 1=P-UP. unused pins (input) PD0...PD6 - P-UPed
-	PORTB = 0b01010110;		// 1=P-UP. PB4(MISO SPI) -P-UP; PB6(RST CPU) -P-UP, PB1(RES Ra-02)output = 1; PB2(CS Ra-02)output = 1;
+	PORTD = 0b00111111;		// 1=P-UP. unused pins (input) PD0...PD6 - P-UPed
+	PORTB = 0b00000000;		// 1=P-UP.
 	PORTC = 0b00111010;		// 1=P-UP. unused pins (input) PC7,PC1-P-UPed; PC6(0V SHT30)output = 0; PC4(SDA)-P-UP, PC5(SCL)-P-UP; PC3(ADC 0V)output = 1; 
 }
 

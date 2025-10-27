@@ -12,6 +12,7 @@
 #include <avr/io.h>
 
 void SPI_MasterInit(void);
+void SPI_MasterDeInit(void);
 uint8_t SPI_MasterTransmit(uint8_t data);
 
 

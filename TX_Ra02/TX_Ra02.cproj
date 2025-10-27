@@ -152,6 +152,12 @@
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Ra02_LoRa.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Ra02_LoRa.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="SHT30.c">
       <SubType>compile</SubType>
     </Compile>
