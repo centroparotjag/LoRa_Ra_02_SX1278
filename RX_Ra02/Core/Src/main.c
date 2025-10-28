@@ -67,11 +67,13 @@ osThreadId myTask_BUTTONHandle;
 /* USER CODE BEGIN PV */
 LoRa myLoRa;
 uint8_t LoRa_stat=0;
-uint8_t RxBuffer[128];
+uint8_t LoRa_RxBuffer[128] = {0};
 uint8_t TxBuffer[128];
+uint8_t LoRa_receive_data = 0;
 int			RSSI;
 uint8_t dev_LoRa = 0;		//Ra_02_pressence (&myLoRa);
 uint16_t background_color = 0;
+extern uint8_t MENU;
 extern uint8_t MENU_update;
 uint8_t RTC_view = 1;
 /* USER CODE END PV */
@@ -149,7 +151,7 @@ int main(void)
 	myLoRa.DIO0_port	= DIO0_GPIO_Port;
 	myLoRa.DIO0_pin		= DIO0_Pin;
 
-	myLoRa.frequency             = 440;			// default = 433 MHz
+	myLoRa.frequency             = 470;			// default = 433 MHz
 	myLoRa.spredingFactor        = SF_7;		// default = SF_7
 	myLoRa.bandWidth			 = BW_31_25KHz;	// default = BW_125KHz
 	myLoRa.crcRate				 = CR_4_5;		// default = CR_4_5
@@ -158,9 +160,12 @@ int main(void)
 	myLoRa.preamble				 = 9;		  	// default = 8;
 
 
-	if(LoRa_init(&myLoRa)==LORA_OK){
-		LoRa_stat = 1;
-	}
+
+//	if(LoRa_init(&myLoRa)==LORA_OK){
+//		LoRa_stat = 1;
+//	}
+	LoRa_reset(&myLoRa);
+	LoRa_init(&myLoRa);
 
 	// START CONTINUOUS RECEIVING -----------------------------------
 	LoRa_startReceiving(&myLoRa);
@@ -424,7 +429,7 @@ static void MX_SPI2_Init(void)
   hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi2.Init.NSS = SPI_NSS_SOFT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_8;
   hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -595,6 +600,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI2_IRQn);
+
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
   /* USER CODE END MX_GPIO_Init_2 */
@@ -605,7 +614,11 @@ static void MX_GPIO_Init(void)
 //Receiver Side
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == myLoRa.DIO0_pin){
-		LoRa_receive(&myLoRa, RxBuffer, 128);
+		LoRa_receive(&myLoRa, LoRa_RxBuffer, 64);
+		LoRa_receive_data = 1;
+		if (MENU == 0){
+			MENU_update = 1;
+		}
 	}
 }
 

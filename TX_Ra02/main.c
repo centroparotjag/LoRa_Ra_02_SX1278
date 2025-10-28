@@ -25,7 +25,7 @@
 FUSES = {
 	.extended = 0xFE,	//0xFE,
 	.high = 0xD2,
-	.low = 0x52	//0x42
+	.low = 0xD2 //0x52	//0x42
 };
 LOCKBITS = (0xFF);	// no_lock
 //******************************** !!! ********************************************
@@ -45,31 +45,44 @@ int main(void)
 	SHT30_heater (1);
 	
 
+
+
+		//_delay_ms(500); // Small delay for stabilization
+		//LoRa_startReceiving();
+
+	uint8_t counter = 0;
+	uint8_t sd[64] = { 1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,16,
+					  17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,
+					  33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,
+					  49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64};
+
+
+
     while (1) 
     {
 
- 
-		
+		//---------------------------------------
 		POW_3V3_en(1);
+		_delay_ms(2);
 		SPI_MasterInit();
-		RST_Ra02(0);
-		_delay_ms(2); // Small delay for stabilization
-		RST_Ra02(1);
-		_delay_ms(10); // Small delay for stabilization
+		LoRa_reset();
 		LoRa_init();
+									LED(1);
+		LoRa_transmit(sd, 64, 1000);
+									LED(0);
+		SHT30_0V_en(0);
+		//----------------------------------------
 
-		uint8_t send_data[16] = {0xAA, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-								 0x08, 0x09, 0x0A, 0xB, 0x0C, 0x0D, 0x0E, 0x0F};
-		LED(1);
-		LoRa_transmit(send_data, 128, 500);
-		LED(0);
 
-		SPI_MasterDeInit();
-		POW_3V3_en(0);
+
 
 		_delay_ms(10000); // Small delay for stabilization
 
-		//SHT30_0V_en(0);
+		for(uint8_t i=0; i<64; i++){
+			sd[i]=sd[i]+1;
+		}
+
+		
 		//_delay_ms(2);		// Small delay for stabilization
 		//uint8_t Th[4];
 		//uint8_t check_crc = mesurement_t_h_SHT30 (Th);

@@ -11,7 +11,7 @@
 
 #include <avr/io.h>
 
-#define F_CPU 1000000UL // Define CPU frequency for _delay_ms()
+#define F_CPU 8000000UL // Define CPU frequency for _delay_ms()
 #define BAUD 9200		// real 10400
 #define UBRR_VALUE ((F_CPU / (16UL * BAUD)) - 1)
 

@@ -11,13 +11,13 @@
 #include "SPI.h"
 #include "init.h"
 
-#define frequency               477       
+#define frequency               470       
 #define spredingFactor          SF_7      
-#define bandWidth			    BW_125KHz 
+#define bandWidth			    BW_31_25KHz 
 #define crcRate                 CR_4_5    
-#define power				    POWER_20db
-#define overCurrentProtection   100       
-#define preamble			    8         
+#define power				    POWER_20db // POWER_20db
+#define overCurrentProtection   130       
+#define preamble			    9         
 
 void LoRa_reset(void){
 	RST_Ra02(0);
@@ -228,7 +228,7 @@ void LoRa_BurstWrite(uint8_t address, uint8_t *value, uint8_t length){
 	uint8_t addr;
 	addr = address | 0x80;
 	CS_Ra02(0);
-	SPI_MasterTransmit(&addr);
+	SPI_MasterTransmit(addr);
 	//Write data in FiFo
 	for (uint8_t i = 0; i<length; ++i){
 		SPI_MasterTransmit(value[i]);
@@ -263,7 +263,7 @@ uint8_t LoRa_transmit(uint8_t* data, uint8_t length, uint16_t timeout){
 				return 0;
 			}
 		}
-		_delay_ms(1);
+		_delay_ms(2);
 	}
 }
 

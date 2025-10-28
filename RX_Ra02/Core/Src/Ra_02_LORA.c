@@ -27,13 +27,13 @@
 LoRa newLoRa(){
 	LoRa new_LoRa;
 
-	new_LoRa.frequency             = 433       ;
+	new_LoRa.frequency             = 444       ;
 	new_LoRa.spredingFactor        = SF_7      ;
-	new_LoRa.bandWidth			   = BW_125KHz ;
+	new_LoRa.bandWidth			   = BW_31_25KHz ;
 	new_LoRa.crcRate               = CR_4_5    ;
 	new_LoRa.power				   = POWER_20db;
-	new_LoRa.overCurrentProtection = 100       ;
-	new_LoRa.preamble			   = 8         ;
+	new_LoRa.overCurrentProtection = 130       ;
+	new_LoRa.preamble			   = 9         ;
 
 	return new_LoRa;
 }
@@ -489,9 +489,9 @@ uint8_t LoRa_receive(LoRa* _LoRa, uint8_t* data, uint8_t length){
 	uint8_t number_of_bytes;
 	uint8_t min = 0;
 
-	for(int i=0; i<length; i++)
+	for(int i=0; i<length; i++){
 		data[i]=0;
-
+	}
 	LoRa_gotoMode(_LoRa, STNBY_MODE);
 	read = LoRa_read(_LoRa, RegIrqFlags);
 	if((read & 0x40) != 0){

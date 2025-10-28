@@ -26,7 +26,9 @@ uint8_t set_pos = 8;
 extern uint16_t background_color;
 extern uint8_t RTC_view;
 extern uint8_t m_counter;
-
+extern uint8_t LoRa_RxBuffer[128];
+extern uint8_t LoRa_receive_data;
+extern int myLoRa;
 void MENU_SELEKTOR (void){
 	//------------ return to MENU_SET (1) -------------
 	if (state_but == 0x02 && MENU != 0 && MENU != 1 && MENU != 5) {
@@ -167,7 +169,28 @@ void MENU_O (void){
 		ST7789_DrawLine(0, 25, 239, 25, YELLOW);
 
 		uint16_t c_color = RGB565(60,165,60);
-		ST7789_DrawString_10x16_background(90, 120, "MENU 0", c_color, background_color);
+		ST7789_DrawString_10x16_background(90, 110, "MENU 0", c_color, background_color);
+	}
+
+	if (LoRa_receive_data == 1){
+		LoRa_receive_data = 0;
+		char buff[24];
+		ST7789_DrawString_10x16_background(10, 220, "RX  ", RED, background_color);
+		uint8_t y=30;
+		for(uint8_t i = 0; i<8; ++i){
+			sprintf(buff, "%02X %02X %02X %02X %02X %02X %02X %02X", LoRa_RxBuffer[i*8+0], LoRa_RxBuffer[i*8+1], LoRa_RxBuffer[i*8+2], LoRa_RxBuffer[i*8+3],
+																	 LoRa_RxBuffer[i*8+4], LoRa_RxBuffer[i*8+5], LoRa_RxBuffer[i*8+6], LoRa_RxBuffer[i*8+7]);
+			ST7789_DrawString_10x16_background(5, y, buff, WHITE, background_color);
+			y+=20;
+		}
+		ST7789_DrawString_10x16_background(10, 220, "WAIT", GREEN, background_color);
+
+//		sprintf(buff, "%02X %02X %02X %02X %02X %02X %02X %02X", RxBuffer[0], RxBuffer[1], RxBuffer[2], RxBuffer[3],
+//																 RxBuffer[4], RxBuffer[5], RxBuffer[6], RxBuffer[7]);
+//		ST7789_DrawString_10x16_background(5, 30, buff, WHITE, background_color);
+//		sprintf(buff, "%02X %02X %02X %02X %02X %02X %02X %02X", RxBuffer[8], RxBuffer[9], RxBuffer[10], RxBuffer[11],
+//																 RxBuffer[12], RxBuffer[13], RxBuffer[14], RxBuffer[16]);
+//		ST7789_DrawString_10x16_background(5, 50, buff, WHITE, background_color);
 	}
 }
 
