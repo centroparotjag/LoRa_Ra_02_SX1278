@@ -5,14 +5,10 @@
  *  Author: centr
  */ 
 
-
 #ifndef RA02_LORA_H_
 #define RA02_LORA_H_
 
-
-#ifndef INC_RA_02_LORA_H_
-#define INC_RA_02_LORA_H_
-
+#include <avr/io.h>
 
 
 #define TRANSMIT_TIMEOUT		2000
@@ -91,56 +87,43 @@
 #define LORA_LARGE_PAYLOAD		413
 #define LORA_UNAVAILABLE		503
 
-typedef struct LoRa_setting{
-
-	// Hardware setings:
-	GPIO_TypeDef*	CS_port;
-	uint16_t		CS_pin;
-	GPIO_TypeDef*	reset_port;
-	uint16_t		reset_pin;
-	GPIO_TypeDef*	DIO0_port;
-	uint16_t		DIO0_pin;
-	SPI_HandleTypeDef*	hSPIx;
-
 	// Module settings:
-	int				current_mode;
-	int 			frequency;
-	uint8_t			spredingFactor;
-	uint8_t			bandWidth;
-	uint8_t			crcRate;
-	uint16_t		preamble;
-	uint8_t			power;
-	uint8_t			overCurrentProtection;
+	uint8_t			current_mode;
+	//uint8_t 		frequency;
+	//uint8_t			spredingFactor;
+	//uint8_t			bandWidth;
+	//uint8_t			crcRate;
+	//uint16_t		preamble;
+	//uint8_t			power;
+	//uint8_t			overCurrentProtection;
 
-} LoRa;
 
-LoRa newLoRa(void);
-void LoRa_reset(LoRa* _LoRa);
-void LoRa_readReg(LoRa* _LoRa, uint8_t* address, uint16_t r_length, uint8_t* output, uint16_t w_length);
-void LoRa_writeReg(LoRa* _LoRa, uint8_t* address, uint16_t r_length, uint8_t* values, uint16_t w_length);
-void LoRa_gotoMode(LoRa* _LoRa, int mode);
-uint8_t LoRa_read(LoRa* _LoRa, uint8_t address);
-void LoRa_write(LoRa* _LoRa, uint8_t address, uint8_t value);
-void LoRa_BurstWrite(LoRa* _LoRa, uint8_t address, uint8_t *value, uint8_t length);
-uint8_t LoRa_isvalid(LoRa* _LoRa);
+void LoRa_reset(void);
+void LoRa_readReg(uint8_t* address, uint16_t r_length, uint8_t* output, uint16_t w_length);
+void LoRa_writeReg(uint8_t* address, uint16_t r_length, uint8_t* values, uint16_t w_length);
+void LoRa_gotoMode(uint8_t mode);
+uint8_t LoRa_read(uint8_t address);
+void LoRa_write(uint8_t address, uint8_t value);
+void LoRa_BurstWrite(uint8_t address, uint8_t *value, uint8_t length);
+uint8_t LoRa_isvalid(void);
 
-void LoRa_setLowDaraRateOptimization(LoRa* _LoRa, uint8_t value);
-void LoRa_setAutoLDO(LoRa* _LoRa);
-void LoRa_setFrequency(LoRa* _LoRa, int freq);
-void LoRa_setSpreadingFactor(LoRa* _LoRa, int SP);
-void LoRa_setPower(LoRa* _LoRa, uint8_t power);
-void LoRa_setOCP(LoRa* _LoRa, uint8_t current);
-void LoRa_setTOMsb_setCRCon(LoRa* _LoRa);
-void LoRa_setSyncWord(LoRa* _LoRa, uint8_t syncword);
-uint8_t LoRa_transmit(LoRa* _LoRa, uint8_t* data, uint8_t length, uint16_t timeout);
-void LoRa_startReceiving(LoRa* _LoRa);
-uint8_t LoRa_receive(LoRa* _LoRa, uint8_t* data, uint8_t length);
-void LoRa_receive_IT(LoRa* _LoRa, uint8_t* data, uint8_t length);
-int LoRa_getRSSI(LoRa* _LoRa);
+void LoRa_setLowDaraRateOptimization(uint8_t value);
+void LoRa_setAutoLDO(void);
+void LoRa_setFrequency(int16_t freq);
+void LoRa_setSpreadingFactor(uint8_t SF);
+void LoRa_setPower(uint8_t p);
+void LoRa_setOCP(uint8_t current);
+void LoRa_setTOMsb_setCRCon(void);
+void LoRa_setSyncWord(uint8_t syncword);
+uint8_t LoRa_transmit(uint8_t* data, uint8_t length, uint16_t timeout);
+void LoRa_startReceiving(void);
+uint8_t LoRa_receive(uint8_t* data, uint8_t length);
+void LoRa_receive_IT(uint8_t* data, uint8_t length);
+int LoRa_getRSSI(void);
 
-uint16_t LoRa_init(LoRa* _LoRa);
+uint16_t LoRa_init(void);
 
-uint8_t Ra_02_pressence (LoRa* _LoRa);
+uint8_t Ra_02_pressence (void);
 
 
 #endif /* RA02_LORA_H_ */

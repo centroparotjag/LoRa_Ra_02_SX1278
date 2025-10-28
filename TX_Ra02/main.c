@@ -11,7 +11,7 @@
 #include "i2c.h"
 #include "SPI.h"
 #include "UART.h"
-
+#include "Ra02_LoRa.h"
 
 
 //************************** FUSES !!! & LOCK !!! *********************************
@@ -44,18 +44,30 @@ int main(void)
 	_delay_ms(5);		// Small delay for stabilization
 	SHT30_heater (1);
 	
-	uint8_t i=1;
+
     while (1) 
     {
-		LED(1);	
+
+ 
+		
 		POW_3V3_en(1);
-		_delay_ms(5000); // Small delay for stabilization  
+		SPI_MasterInit();
+		RST_Ra02(0);
+		_delay_ms(2); // Small delay for stabilization
+		RST_Ra02(1);
+		_delay_ms(10); // Small delay for stabilization
+		LoRa_init();
+
+		uint8_t send_data[16] = {0xAA, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+								 0x08, 0x09, 0x0A, 0xB, 0x0C, 0x0D, 0x0E, 0x0F};
+		LED(1);
+		LoRa_transmit(send_data, 128, 500);
 		LED(0);
+
+		SPI_MasterDeInit();
 		POW_3V3_en(0);
-		_delay_ms(5000); // Small delay for stabilization
 
-
-
+		_delay_ms(10000); // Small delay for stabilization
 
 		//SHT30_0V_en(0);
 		//_delay_ms(2);		// Small delay for stabilization

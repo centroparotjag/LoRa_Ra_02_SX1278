@@ -9,6 +9,7 @@
 
 #include <avr/io.h>
 #include "SPI.h"
+#include "init.h"
 
 // Function to initialize SPI as Master
 void SPI_MasterInit(void) {
@@ -32,5 +33,5 @@ uint8_t SPI_MasterTransmit(uint8_t data) {
 	// Wait for transmission complete
 	while (!(SPSR & (1 << SPIF)));
 	// Return data from SPI data register
-	return SPDR;
+	return (uint8_t)SPDR;
 }
