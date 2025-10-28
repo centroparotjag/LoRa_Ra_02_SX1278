@@ -15,7 +15,7 @@
 #define spredingFactor          SF_7      
 #define bandWidth			    BW_31_25KHz 
 #define crcRate                 CR_4_5    
-#define power				    POWER_20db // POWER_20db
+#define power				    POWER_11db // POWER_20db
 #define overCurrentProtection   130       
 #define preamble			    9         
 
