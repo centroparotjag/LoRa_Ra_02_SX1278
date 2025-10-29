@@ -172,25 +172,45 @@ void MENU_O (void){
 		ST7789_DrawString_10x16_background(90, 110, "MENU 0", c_color, background_color);
 	}
 
+
 	if (LoRa_receive_data == 1){
+		HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_SET);   // power hold - enabled
 		LoRa_receive_data = 0;
 		char buff[24];
 		ST7789_DrawString_10x16_background(10, 220, "RX  ", RED, background_color);
-		uint8_t y=30;
-		for(uint8_t i = 0; i<8; ++i){
-			sprintf(buff, "%02X %02X %02X %02X %02X %02X %02X %02X", LoRa_RxBuffer[i*8+0], LoRa_RxBuffer[i*8+1], LoRa_RxBuffer[i*8+2], LoRa_RxBuffer[i*8+3],
-																	 LoRa_RxBuffer[i*8+4], LoRa_RxBuffer[i*8+5], LoRa_RxBuffer[i*8+6], LoRa_RxBuffer[i*8+7]);
-			ST7789_DrawString_10x16_background(5, y, buff, WHITE, background_color);
-			y+=20;
-		}
-		ST7789_DrawString_10x16_background(10, 220, "WAIT", GREEN, background_color);
 
-//		sprintf(buff, "%02X %02X %02X %02X %02X %02X %02X %02X", RxBuffer[0], RxBuffer[1], RxBuffer[2], RxBuffer[3],
-//																 RxBuffer[4], RxBuffer[5], RxBuffer[6], RxBuffer[7]);
-//		ST7789_DrawString_10x16_background(5, 30, buff, WHITE, background_color);
-//		sprintf(buff, "%02X %02X %02X %02X %02X %02X %02X %02X", RxBuffer[8], RxBuffer[9], RxBuffer[10], RxBuffer[11],
-//																 RxBuffer[12], RxBuffer[13], RxBuffer[14], RxBuffer[16]);
-//		ST7789_DrawString_10x16_background(5, 50, buff, WHITE, background_color);
+//      //------------ full damp -----------------------------------------------
+//		uint8_t y=30;
+//		for(uint8_t i = 0; i<8; ++i){
+//			sprintf(buff, "%02X %02X %02X %02X %02X %02X %02X %02X", LoRa_RxBuffer[i*8+0], LoRa_RxBuffer[i*8+1], LoRa_RxBuffer[i*8+2], LoRa_RxBuffer[i*8+3],
+//																	 LoRa_RxBuffer[i*8+4], LoRa_RxBuffer[i*8+5], LoRa_RxBuffer[i*8+6], LoRa_RxBuffer[i*8+7]);
+//			ST7789_DrawString_10x16_background(5, y, buff, WHITE, background_color);
+//			y+=20;
+//		}
+		//------------- convert raw data to T, h----------------------------------
+		uint16_t temp_raw = 0;
+		uint16_t hum_raw  = 0;
+
+		temp_raw |= LoRa_RxBuffer[0]<<8 | LoRa_RxBuffer[1];
+		hum_raw  |= LoRa_RxBuffer[2]<<8 | LoRa_RxBuffer[3];
+
+		float temperature = (175.0f * ((float)temp_raw / 65535.0f)) - 45.0f;
+		float humidity = 100.0f * ((float)hum_raw / 65535.0f);
+		float Vbat = (LoRa_RxBuffer[4]+250.0f)/100.0f;
+
+		sprintf (buff, "T = %.2f C, h = %.2f " , temperature, humidity);
+		ST7789_DrawString_10x16_background(5, 50, buff, GREEN, background_color);
+
+		sprintf (buff, "Vbat = %.2f V" , Vbat);
+		ST7789_DrawString_10x16_background(5, 70, buff, GREEN, background_color);
+
+		//-------------- raw data ---------------------
+		sprintf(buff, "RAW - %02X %02X %02X %02X %02X ", LoRa_RxBuffer[0], LoRa_RxBuffer[1], LoRa_RxBuffer[2], LoRa_RxBuffer[3], LoRa_RxBuffer[4]);
+		ST7789_DrawString_10x16_background(10, 200, buff, WHITE, background_color);
+
+		ST7789_DrawString_10x16_background(10, 220, "WAIT", GREEN, background_color);
+		HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_RESET);   // power hold - disabled
+
 	}
 }
 
