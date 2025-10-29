@@ -25,6 +25,11 @@ void i2c_init(void) {
 	TWCR = (1 << TWEN);
 }
 
+void i2c_deinit(void) {
+	// Enable TWI
+	TWCR = 0;
+}
+
 uint8_t i2c_start(uint8_t address) {
 	// Send START condition
 	TWCR = (1 << TWINT) | (1 << TWSTA) | (1 << TWEN);

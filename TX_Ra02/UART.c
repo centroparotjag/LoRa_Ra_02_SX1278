@@ -23,6 +23,11 @@ void uart_init(void) {
 	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00); // 8-bit data
 }
 
+void uart_deinit(void) {
+	// Enable receiver and transmitter
+	UCSR0B = 0;
+}
+
 void uart_transmit(unsigned char data) {
 	// Wait for empty transmit buffer
 	while (!(UCSR0A & (1 << UDRE0)));

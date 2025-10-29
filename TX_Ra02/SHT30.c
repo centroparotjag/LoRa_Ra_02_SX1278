@@ -27,11 +27,6 @@ uint8_t calculate_crc8_nrsc5(const uint8_t* data) {
 	return crc; // No final XOR applied as it's 0x00
 }
 
-
-//float temperature = -45.0f + 175.0f * ((float)temp_raw / 65535.0f);
-//float humidity = 100.0f * ((float)hum_raw / 65535.0f);
-
-
 void SHT30_heater (uint8_t onoff){
 	uint8_t heater_enable_cmd [2]	=  {0x30,0x6D};
 	uint8_t heater_disable_cmd[2]	=  {0x30,0x66};
@@ -48,15 +43,9 @@ uint16_t SHT30_read_status_reg (void){
 	uint8_t read_status_reg_cmd[2]	= {0xF3, 0x2D};
 	uint16_t status_reg = 0;
 
-	//HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, read_status_reg_cmd, 2, 100);
-	//HAL_Delay(16);
-	
 	WRITE_DATA_I2C (SHT30_ADDR_I2C, read_status_reg_cmd, 2);
-	//_delay_ms(1); // Small delay
-	
 
 	uint8_t pData[3] = {0};
-	//HAL_I2C_Master_Receive(& hi2c1, SHT30_i2c_addr, pData, 3, 100);
 	READ_DATA_I2C (SHT30_ADDR_I2C, pData, 3);
 
 	// CRC check
@@ -69,7 +58,8 @@ uint16_t SHT30_read_status_reg (void){
 	return status_reg;
 }
 
-uint8_t mesurement_t_h_SHT30 (uint8_t* Th){
+uint8_t measurement_t_h_SHT30 (uint8_t* Th){
+	i2c_init();
 	//-----------command for SHT30 ------------------------
 	uint8_t soft_reset_cmd[2] 		= {0x30, 0xA2};
 	uint8_t mesurement_cmd[2] 		= {0x24, 0x00};	// Repeatability (LSB) High 0x06, Medium 0x0D, Low 0x10
@@ -81,20 +71,16 @@ uint8_t mesurement_t_h_SHT30 (uint8_t* Th){
 	//--------------------------------------------------
 	uint16_t status = SHT30_read_status_reg ();
 	if ((status & 0x2000) != 0x2000){
-		//HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, soft_reset_cmd, 2, 100);
-		//HAL_Delay(2);
 		WRITE_DATA_I2C (SHT30_ADDR_I2C, soft_reset_cmd, 2);
 		_delay_ms(2); // Small delay
 	}
-
-	//HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, mesurement_cmd, 2, 100);
-	//HAL_Delay(16);
 	WRITE_DATA_I2C (SHT30_ADDR_I2C, mesurement_cmd, 2);
 	_delay_ms(16); // Small delay
 
 	uint8_t pData[6] = {0};
-	//HAL_I2C_Master_Receive(& hi2c1, SHT30_i2c_addr, pData, 6, 100);
 	READ_DATA_I2C (SHT30_ADDR_I2C, pData, 6);
+	
+	i2c_deinit();
 
 	// CRC check
 	uint8_t data_t_crc[2] = {pData[0], pData[1]};

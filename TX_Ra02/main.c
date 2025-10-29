@@ -6,13 +6,19 @@
  */ 
 
 #include <avr/io.h>
+#include <avr/sleep.h>
+#include <avr/interrupt.h>
+
 #include "SHT30.h"
 #include "init.h"
 #include "i2c.h"
 #include "SPI.h"
 #include "UART.h"
 #include "Ra02_LoRa.h"
+#include "ADC.h"
 
+#define DISABLE 0
+#define ENABLE  1
 
 //************************** FUSES !!! & LOCK !!! *********************************
 // EXTENDET.BODLEVEL = brown-out detection at VCC=1.8V
@@ -25,79 +31,70 @@
 FUSES = {
 	.extended = 0xFE,	//0xFE,
 	.high = 0xD2,
-	.low = 0xD2 //0x52	//0x42
+	.low = 0x52 //0x52	//0xD2 - 8MHz
 };
 LOCKBITS = (0xFF);	// no_lock
 //******************************** !!! ********************************************
 
+uint32_t volatile sleep_timer = 60;
 
 int main(void)
-{
+{	
+	WDTCSR=0;
 	GPIO_init();		// Initialize GPIO
-	i2c_init();			// Initialize I2C
-	SPI_MasterDeInit();
-	//SPI_MasterInit();	// Initialize SPI
-	uart_init();		// Initialize UART
-	_delay_ms(100);		// Small delay for stabilization    
+	timer1_init ();
+	sleep_init ();
 	
-	SHT30_0V_en(0);
-	_delay_ms(5);		// Small delay for stabilization
-	SHT30_heater (1);
-	
-
-
-
-		//_delay_ms(500); // Small delay for stabilization
-		//LoRa_startReceiving();
-
-	uint8_t counter = 0;
+	//==================== DEBUG ======================================
 	uint8_t sd[64] = { 0,1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
 					  16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
 					  32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,
 					  48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63};
-
+	//=================================================================
 
 
     while (1) 
     {
+		uint8_t T_h [4] = {0};
 
-		//---------------------------------------
-		POW_3V3_en(1);
-		_delay_ms(1);
-		SPI_MasterInit();
-		LoRa_reset();
-		LoRa_init();
-									LED(1);
-		LoRa_transmit(sd, 64, 1000);
-									LED(0);
-		POW_3V3_en(0);
-		SPI_MasterDeInit();
-		//----------------------------------------
-
-
-
-
-		_delay_ms(5000); // Small delay for stabilization
-
-		for(uint8_t i=0; i<64; i++){
-			sd[i]=sd[i]+64;
-		}
-
-		
-		//_delay_ms(2);		// Small delay for stabilization
-		//uint8_t Th[4];
-		//uint8_t check_crc = mesurement_t_h_SHT30 (Th);
-		//SHT30_0V_en(1);
+		if (sleep_timer > 60){				// period in seconds
+			sleep_idle_startup (DISABLE);
+			//---------- measurement ADC, TH30 (T, h) -----------
+			activation_of_electrical_circuits (1);
+			measurement_t_h_SHT30 (T_h);
+			
+			LED(1);
+			uint8_t Vbat =  Vbat_adc_read();
+			LED(0);
+			
+			activation_of_electrical_circuits (0);
 				
-		
-		//char buff[20] = "Hello word";
-		//sprintf(buff, "t=%02X%02X h=%02X%02X crc=%d", Th[0], Th[1], Th[2], Th[3], check_crc);
-		//
-		//for(uint8_t i=0; i<19; ++i){
-			//uart_transmit(buff[i]);
-		//}
-		//uart_transmit('\r');
+			//-------- forming data ---------------		
+			sd[0] =	T_h[0];			// T-msB
+			sd[1] =	T_h[1];			// T-lsB
+			sd[2] =	T_h[2];			// h-msB
+			sd[3] =	T_h[3];			// h-lsB
+			sd[4] =	Vbat;			// V_battery = (Vbat+250)/100;
 
-    }
+			//---------- LoRa transmit data ----------
+			 LoRa_transmit_main_data (sd, 5);
+			//----------------------------------------
+			
+			sleep_timer = 0;			// reset timer (1s)
+		}
+		
+
+			sleep_idle_startup (ENABLE);		//  sleep here
+
+	}
+}
+
+
+
+
+// TIMER1 interrupt service routine
+ISR(TIMER1_COMPA_vect)
+{
+	sleep_timer++;
 }
 

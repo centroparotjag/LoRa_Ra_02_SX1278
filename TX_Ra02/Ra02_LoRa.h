@@ -124,6 +124,6 @@ int LoRa_getRSSI(void);
 uint16_t LoRa_init(void);
 
 uint8_t Ra_02_pressence (void);
-
+void LoRa_transmit_main_data (uint8_t* data, uint8_t len);
 
 #endif /* RA02_LORA_H_ */

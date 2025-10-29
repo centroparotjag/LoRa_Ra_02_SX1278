@@ -10,7 +10,7 @@
 #define INIT_H_
 
 #ifndef F_CPU
-#define F_CPU 8000000UL
+#define F_CPU 1000000UL
 #endif
 #include <util/delay.h>
 
@@ -24,8 +24,10 @@
 
 void GPIO_init(void);
 void i2c_init(void) ;
+void timer1_init (void);
 void sleep_init (void);
 void sleep_idle_startup (unsigned char status);
+void activation_of_electrical_circuits (uint8_t en);
 
 
 #endif /* INIT_H_ */

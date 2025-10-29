@@ -379,3 +379,22 @@ uint8_t Ra_02_pressence (void){
 	else
 		return 0;
 }
+
+
+
+void LoRa_transmit_main_data (uint8_t* data, uint8_t len){
+	POW_3V3_en(1);
+	_delay_ms(1);
+	SPI_MasterInit();
+	LoRa_reset();
+	LoRa_init();
+	
+	LoRa_transmit(data, len, 1000);
+	
+	POW_3V3_en(0);
+	SPI_MasterDeInit();
+}
+	
+	
+
+
