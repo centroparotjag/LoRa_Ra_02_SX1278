@@ -614,7 +614,7 @@ static void MX_GPIO_Init(void)
 //Receiver Side
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == myLoRa.DIO0_pin){
-		LoRa_receive(&myLoRa, LoRa_RxBuffer, 5);
+		LoRa_receive(&myLoRa, LoRa_RxBuffer, 7);
 		LoRa_receive_data = 1;
 		if (MENU == 0){
 			MENU_update = 1;

@@ -181,6 +181,11 @@ void MENU_O (void){
 		char buff[24];
 		ST7789_DrawString_10x16_background(10, 220, "RX  ", RED, background_color);
 
+
+		//-------------------- decoding data ----------------------------
+		uint8_t DecodedDataPacket[7]={0};
+		uint8_t CRC_check = DecodingAndVerificationOfDataPacket (LoRa_RxBuffer, DecodedDataPacket);
+
 //      //------------ full damp -----------------------------------------------
 //		uint8_t y=30;
 //		for(uint8_t i = 0; i<8; ++i){
@@ -193,23 +198,20 @@ void MENU_O (void){
 		uint16_t temp_raw = 0;
 		uint16_t hum_raw  = 0;
 
-		temp_raw |= LoRa_RxBuffer[0]<<8 | LoRa_RxBuffer[1];
-		hum_raw  |= LoRa_RxBuffer[2]<<8 | LoRa_RxBuffer[3];
+		temp_raw |= DecodedDataPacket[0]<<8 | DecodedDataPacket[1];
+		hum_raw  |= DecodedDataPacket[2]<<8 | DecodedDataPacket[3];
 
 		float temperature = (175.0f * ((float)temp_raw / 65535.0f)) - 45.0f;
 		float humidity = 100.0f * ((float)hum_raw / 65535.0f);
-		float Vbat = (LoRa_RxBuffer[4]+250.0f)/100.0f;
+		float Vbat = (DecodedDataPacket[4]+250.0f)/100.0f;
 
-		sprintf (buff, "T = %.2f C, h = %.2f " , temperature, humidity);
+		sprintf (buff, "T = %.2f, h = %.2f     " , temperature, humidity);
 		ST7789_DrawString_10x16_background(5, 50, buff, GREEN, background_color);
 
-		sprintf (buff, "Vbat = %.2f V" , Vbat);
+		sprintf (buff, "Vbat = %.2f; CRC=%d" , Vbat, CRC_check);
 		ST7789_DrawString_10x16_background(5, 70, buff, GREEN, background_color);
 
 		//-------------- raw data ---------------------
-		sprintf(buff, "RAW - %02X %02X %02X %02X %02X ", LoRa_RxBuffer[0], LoRa_RxBuffer[1], LoRa_RxBuffer[2], LoRa_RxBuffer[3], LoRa_RxBuffer[4]);
-		ST7789_DrawString_10x16_background(10, 200, buff, WHITE, background_color);
-
 		ST7789_DrawString_10x16_background(10, 220, "WAIT", GREEN, background_color);
 		HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_RESET);   // power hold - disabled
 
