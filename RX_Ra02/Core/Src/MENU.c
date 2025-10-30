@@ -16,6 +16,8 @@
 #include "adc.h"
 #include "fram.h"
 #include <stdio.h>
+#include "data_encoding.h"
+
 
 uint8_t MENU = 0;
 uint8_t MENU_update = 1;
@@ -26,7 +28,7 @@ uint8_t set_pos = 8;
 extern uint16_t background_color;
 extern uint8_t RTC_view;
 extern uint8_t m_counter;
-extern uint8_t LoRa_RxBuffer[128];
+extern uint8_t LoRa_RxBuffer[7];
 extern uint8_t LoRa_receive_data;
 extern int myLoRa;
 void MENU_SELEKTOR (void){
@@ -210,6 +212,9 @@ void MENU_O (void){
 
 		ST7789_DrawString_10x16_background(10, 220, "WAIT", GREEN, background_color);
 		HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_RESET);   // power hold - disabled
+
+
+		test_encoding_decoding_data ();
 
 	}
 }

@@ -67,8 +67,8 @@ osThreadId myTask_BUTTONHandle;
 /* USER CODE BEGIN PV */
 LoRa myLoRa;
 uint8_t LoRa_stat=0;
-uint8_t LoRa_RxBuffer[128] = {0};
-uint8_t TxBuffer[128];
+uint8_t LoRa_RxBuffer[7] = {0};
+uint8_t TxBuffer[7];
 uint8_t LoRa_receive_data = 0;
 int			RSSI;
 uint8_t dev_LoRa = 0;		//Ra_02_pressence (&myLoRa);
