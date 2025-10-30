@@ -16,6 +16,7 @@
 #include "UART.h"
 #include "Ra02_LoRa.h"
 #include "ADC.h"
+#include "data_encoding.h"
 
 #define DISABLE 0
 #define ENABLE  1
@@ -37,6 +38,7 @@ LOCKBITS = (0xFF);	// no_lock
 //******************************** !!! ********************************************
 
 uint32_t volatile sleep_timer = 60;
+extern uint8_t counter_code;
 
 int main(void)
 {	
@@ -46,10 +48,7 @@ int main(void)
 	sleep_init ();
 	
 	//==================== DEBUG ======================================
-	uint8_t sd[64] = { 0,1, 2, 3, 4, 5, 6, 7, 8, 9,10,11,12,13,14,15,
-					  16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
-					  32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,
-					  48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63};
+	uint8_t sd[7] = {0};
 	//=================================================================
 
 
@@ -57,7 +56,7 @@ int main(void)
     {
 		uint8_t T_h [4] = {0};
 
-		if (sleep_timer > 60){				// period in seconds
+		if (sleep_timer > 5){				// period in seconds
 			sleep_idle_startup (DISABLE);
 			//---------- measurement ADC, TH30 (T, h) -----------
 			activation_of_electrical_circuits (1);
@@ -76,8 +75,12 @@ int main(void)
 			sd[3] =	T_h[3];			// h-lsB
 			sd[4] =	Vbat;			// V_battery = (Vbat+250)/100;
 
+			//---------- encoding data ------------
+			uint8_t EncodedDataPacket[7]={0};
+			DataEncoding_FormationTransmittedPackets (sd, EncodedDataPacket);
+			
 			//---------- LoRa transmit data ----------
-			 LoRa_transmit_main_data (sd, 5);
+			 LoRa_transmit_main_data (EncodedDataPacket, 7);
 			//----------------------------------------
 			
 			sleep_timer = 0;			// reset timer (1s)
