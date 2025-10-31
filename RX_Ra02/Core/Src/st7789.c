@@ -566,7 +566,7 @@ void ST7789_DrawString_10x16 (int16_t x0, int16_t y0, char * str, uint16_t color
   }
 }
 
-//-----
+//---------------------------------------------------- 10x16------------------------------------------------------------------
 void ST7789_DrawChar_10x16_background (int16_t x0, int16_t y0, char character, uint16_t color, uint16_t background_color)
 {
 	int pix = 0x01;
@@ -604,3 +604,50 @@ void ST7789_DrawString_10x16_background (int16_t x0, int16_t y0, char * str, uin
   }
 }
 
+//---------------------------------------------------- 26x30------------------------------------------------------------------
+void ST7789_DrawChar_26x30_background (int16_t x0, int16_t y0, char character, uint16_t color, uint16_t background_color)
+{
+	uint8_t pix = 0x01;
+	uint8_t sym = 0;
+
+	if(character >= 0x30 && character <= 0x39){
+		sym = character - 0x30;
+	}
+	else {
+		switch (character) {
+			case '.': sym = 10; break;
+			case 'g': sym = 11; break;
+			case 'C': sym = 12; break;
+			case '%': sym = 13; break;
+			case ' ': sym = 14; break;
+			case '-': sym = 15; break;
+			default:  sym = 14; break;
+		}
+	}
+
+	int16_t BS=0;
+	for (int16_t Y=0; Y < 26; ++Y) {
+		for (int16_t Bschift=0; Bschift < 4; ++Bschift) {
+			pix = 0x01;
+			for (int16_t X=0; X < 8; ++X) {
+				if ( FONT_terminator_two_26x30[sym][BS]  & pix ) {			// FONT_terminator_two_26x30[sym][X]
+					ST7789_DrawPixel(X + x0+(Bschift*8), Y + y0, color);
+				}
+				else {
+					ST7789_DrawPixel(X + x0+(Bschift*8), Y + y0, background_color);
+				}
+				pix = pix << 1;
+			}
+			BS++;
+		}
+	}
+}
+
+void ST7789_DrawString_26x30_background (int16_t x0, int16_t y0, char * str, uint16_t color, uint16_t background_color)
+{
+  uint16_t i = 0;
+  while (str[i] != '\0' && i<=9) {
+	  ST7789_DrawChar_26x30_background  ( x0+(28*i), y0, str[i], color, background_color);
+	  i++;
+  }
+}

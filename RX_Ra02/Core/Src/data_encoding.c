@@ -87,6 +87,11 @@ void test_encoding_decoding_data (void){
 														  LoRa_RxBuffer[4], LoRa_RxBuffer[5], LoRa_RxBuffer[6]);
 	ST7789_DrawString_10x16_background(0, 110, buff, WHITE, background_color);
 
+	uint8_t key_init = decoding_key_init (LoRa_RxBuffer[5]);
+
+	sprintf(buff, "key_init = %X", key_init);
+	ST7789_DrawString_10x16_background(0, 130, buff, WHITE, background_color);
+
 //	//--------------- encoded data and forming packet TX ----------------
 //	uint8_t encoded_Buffer[7] = {0};
 //	uint8_t KEY_NUM = encoding_key_init (counter_code);

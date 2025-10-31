@@ -16,5 +16,6 @@
   // @const Characters
   extern const uint8_t FONT_5x8 [][CHARS_COLS_LENGTH];
   extern const uint8_t FONT_terminal_10x15[96][20];
+  extern const uint8_t FONT_terminator_two_26x30[16][104];
 
 #endif /* INC_FONT_H_ */

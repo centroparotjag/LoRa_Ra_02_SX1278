@@ -172,6 +172,8 @@ void MENU_O (void){
 
 		uint16_t c_color = RGB565(60,165,60);
 		ST7789_DrawString_10x16_background(90, 110, "MENU 0", c_color, background_color);
+
+		ST7789_DrawString_26x30_background (0, 170, "-23.57gC",  GREEN, background_color);
 	}
 
 
@@ -219,6 +221,8 @@ void MENU_O (void){
 		test_encoding_decoding_data ();
 
 	}
+
+
 }
 
 void MENU_STAT (void){

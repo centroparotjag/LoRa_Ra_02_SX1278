@@ -4,7 +4,6 @@
  * Created: 26.10.2025 9:00:56
  * Author : centr
  */ 
-
 #include <avr/io.h>
 #include <avr/sleep.h>
 #include <avr/interrupt.h>
@@ -20,7 +19,6 @@
 
 #define DISABLE 0
 #define ENABLE  1
-
 //************************** FUSES !!! & LOCK !!! *********************************
 // EXTENDET.BODLEVEL = brown-out detection at VCC=1.8V
 // HIGH.SPEN
@@ -47,27 +45,29 @@ int main(void)
 	timer1_init ();
 	sleep_init ();
 	
-	//==================== DEBUG ======================================
-	uint8_t sd[7] = {0};
-	//=================================================================
-
+	//==================== initial counter KEY encoded ======================================
+	uint8_t T_h [4] = {0};
+	activation_of_electrical_circuits (1);
+	measurement_t_h_SHT30 (T_h);
+	uint8_t KeyCounter = 0;
+	for(uint8_t i = 0; i<5; ++i){
+		KeyCounter += T_h [i];
+	}
+	counter_code = KeyCounter;
+	//=======================================================================================
 
     while (1) 
     {
-		uint8_t T_h [4] = {0};
-
-		if (sleep_timer > 5){				// period in seconds
+		uint8_t sd[7] = {0};
+		if (sleep_timer > 60){				// period in seconds
 			sleep_idle_startup (DISABLE);
 			//---------- measurement ADC, TH30 (T, h) -----------
 			activation_of_electrical_circuits (1);
 			measurement_t_h_SHT30 (T_h);
-			
 			LED(1);
 			uint8_t Vbat =  Vbat_adc_read();
 			LED(0);
-			
-			activation_of_electrical_circuits (0);
-				
+			activation_of_electrical_circuits (0);	
 			//-------- forming data ---------------		
 			sd[0] =	T_h[0];			// T-msB
 			sd[1] =	T_h[1];			// T-lsB
@@ -78,17 +78,12 @@ int main(void)
 			//---------- encoding data ------------
 			uint8_t EncodedDataPacket[7]={0};
 			DataEncoding_FormationTransmittedPackets (sd, EncodedDataPacket);
-			
 			//---------- LoRa transmit data ----------
 			 LoRa_transmit_main_data (EncodedDataPacket, 7);
 			//----------------------------------------
-			
 			sleep_timer = 0;			// reset timer (1s)
 		}
-		
-
 			sleep_idle_startup (ENABLE);		//  sleep here
-
 	}
 }
 

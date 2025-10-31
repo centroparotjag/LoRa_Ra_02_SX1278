@@ -62,7 +62,20 @@ void DataEncoding_FormationTransmittedPackets (uint8_t* DATA_RAW, uint8_t* Encod
 	EncodedDataPacket[5] = KEY_NUM;
 	uint8_t CRC_8 = calculate_crc8_coding(EncodedDataPacket, 6);
 	EncodedDataPacket[6] = CRC_8;
-	counter_code++;
+	//counter_code++;
+	
+	//======== counter code randominaiser ===================
+	uint16_t KeyCounter = 0;
+	for(uint8_t i = 0; i<7; ++i){
+		KeyCounter += DATA_RAW [i];
+	}
+	
+	if((uint8_t)KeyCounter == counter_code) {
+		counter_code++;
+	}
+	else {
+		counter_code = KeyCounter;
+	}
 }
 
 

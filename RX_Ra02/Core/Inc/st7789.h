@@ -95,6 +95,8 @@ void ST7789_DrawChar_10x16 (int16_t x0, int16_t y0, char character, uint16_t col
 void ST7789_DrawString_10x16 (int16_t x0, int16_t y0, char * str, uint16_t color);
 void ST7789_DrawChar_10x16_background (int16_t x0, int16_t y0, char character, uint16_t color, uint16_t background_color);
 void ST7789_DrawString_10x16_background (int16_t x0, int16_t y0, char * str, uint16_t color, uint16_t background_color);
+void ST7789_DrawChar_26x30_background (int16_t x0, int16_t y0, char character, uint16_t color, uint16_t background_color);
+void ST7789_DrawString_26x30_background (int16_t x0, int16_t y0, char * str, uint16_t color, uint16_t background_color);
 void test_display_demo (void);
 void disp_test (void);
 #endif
