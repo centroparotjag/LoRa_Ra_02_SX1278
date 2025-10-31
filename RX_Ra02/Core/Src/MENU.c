@@ -172,9 +172,9 @@ void MENU_SET (void){
 
 void MENU_O (void){
 	char buff[24];
-	background_color 		  = RGB565(128,128,0);
-	uint16_t frame_color      = RGB565(189,183,107);
-	uint16_t frame_fill_color = RGB565(85,107,47);
+	background_color 		  = RGB565(80,80,80);
+	uint16_t frame_color      = RGB565(128,128,128);
+	uint16_t frame_fill_color = RGB565(105,105,105);
 	uint16_t col_t = GREEN;
 	uint16_t col_h = GREEN;
 	uint16_t col_V = GREEN;
@@ -200,7 +200,8 @@ void MENU_O (void){
 		ST7789_DrawLine(145, 105, 145, 135, frame_color);
 		ST7789_DrawLine(146, 105, 146, 135, frame_color);
 
-		ST7789_DrawString_10x16_background(40, 77, "WAITING FOR DATA", WHITE, frame_fill_color);
+		ST7789_DrawString_10x16_background(80, 37, "NO DATA", RGB565(150,150,150), frame_fill_color);
+		ST7789_DrawString_10x16_background(40, 77, "WAITING FOR DATA", RGB565(150,150,150), frame_fill_color);
 
 
 	}
