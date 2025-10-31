@@ -19,8 +19,9 @@ extern I2C_HandleTypeDef hi2c1;
 // 00 01 02 03  |  04 05 06 07   |
 // count init   |  count time ON |
 //--------------------------------
-#define addr_fram_count_init	0x00
-#define addr_fram_count_time_on	0x10
+#define addr_fram_count_init				0x00
+#define addr_fram_count_time_on				0x10
+#define addr_fram_received_byte_counter		0x20
 
 uint32_t FRAM_data_verification (uint8_t* DATA){
 
@@ -104,6 +105,33 @@ void write_fram_count_time_on(void){
 	HAL_I2C_Mem_Write(& hi2c1, FRAM_i2c_addrr, addr_fram_count_time_on, 1, pData, 12, 100);
 }
 
+//-------------------------------------------------------------------------
+uint32_t read_fram_received_byte_counter (void){
+	uint32_t count = 0;
+	uint8_t pData[12] = {0};
+	HAL_I2C_Mem_Read (& hi2c1, FRAM_i2c_addrr, addr_fram_received_byte_counter, 1, pData, 12, 100);
+	count = FRAM_data_verification (&pData);
+	return count;
+}
+
+void write_fram_received_byte_counter (void){
+	uint8_t pData[12] = {0};
+	uint32_t count = read_fram_received_byte_counter ();
+	count += 7;
+	pData[0] = (uint8_t)((count & 0xFF000000) >> 24);
+	pData[1] = (uint8_t)((count & 0x00FF0000) >> 16);
+	pData[2] = (uint8_t)((count & 0x0000FF00) >> 8);
+	pData[3] = (uint8_t)( count & 0x000000FF);
+	pData[4] = pData[0];
+	pData[5] = pData[1];
+	pData[6] = pData[2];
+	pData[7] = pData[3];
+	pData[8] = pData[0];
+	pData[9] = pData[1];
+	pData[10] =pData[2];
+	pData[11] =pData[3];
+	HAL_I2C_Mem_Write(& hi2c1, FRAM_i2c_addrr, addr_fram_received_byte_counter	, 1, pData, 12, 100);
+}
 //---------------------------------------------------------------------------
 
 uint8_t dev_i2c_presence (void){
@@ -156,5 +184,8 @@ void fram_erase_full (void){
 		HAL_I2C_Mem_Write(& hi2c1, FRAM_i2c_addrr|0x02, i, 1, zero_byte, 1, 100);
 	}
 }
+
+
+
 
 

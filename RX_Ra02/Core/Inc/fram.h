@@ -15,6 +15,8 @@ uint32_t read_fram_count_init (void);
 void write_fram_count_init (void);
 uint32_t read_fram_count_time_on (void);
 void write_fram_count_time_on(void);
+uint32_t read_fram_received_byte_counter (void);
+void write_fram_received_byte_counter (void);
 
 void read_fram_into_terminal (void);
 void fram_erase_full (void);

@@ -76,6 +76,9 @@ uint16_t background_color = 0;
 extern uint8_t MENU;
 extern uint8_t MENU_update;
 uint8_t RTC_view = 1;
+uint32_t RX_fix_time_sec = 0;
+extern uint32_t sec_time;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -614,11 +617,16 @@ static void MX_GPIO_Init(void)
 //Receiver Side
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == myLoRa.DIO0_pin){
+		HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_SET);   // led button on
 		LoRa_receive(&myLoRa, LoRa_RxBuffer, 7);
+		write_fram_received_byte_counter ();
 		LoRa_receive_data = 1;
+		RX_fix_time_sec = sec_time;
+
 		if (MENU == 0){
 			MENU_update = 1;
 		}
+		HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_RESET);  // led button off
 	}
 }
 

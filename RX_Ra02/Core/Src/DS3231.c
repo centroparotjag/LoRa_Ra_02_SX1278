@@ -19,6 +19,7 @@
 extern I2C_HandleTypeDef hi2c1;
 extern uint8_t MENU_update;
 uint8_t flag_once_wr_count_init = 0;
+uint32_t sec_time = 0;
 
 void displayed_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 
@@ -41,6 +42,9 @@ void displayed_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 	d = ((pData[4] & 0xF0)>>4)*10 + (pData[4] & 0x0F);
 	M = ((pData[5] & 0x10)>>4)*10 + (pData[5] & 0x0F);
 	Y = ((pData[6] & 0xF0)>>4)*10 + (pData[6] & 0x0F);
+
+	sec_time = convert_time_to_sec (H, m, s);
+
 
 	char buff  [8] = {0};
 
@@ -85,6 +89,23 @@ void displayed_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 }
 
 
+uint32_t convert_time_to_sec (uint8_t H, uint8_t m, uint8_t s){
+	uint32_t sec = (H*3600) + (m*60) + s;
+	return sec;
+}
+
+void convert_time_sec_to_H_m_s (uint32_t sec, uint8_t* arr){
+	//sec = 83553;    //test
+
+	uint32_t HOURS     = sec/3600;
+	uint32_t min       = (sec-(HOURS*3600))/60;
+	uint32_t seconds   = sec%60;
+
+	arr[0] = (uint8_t) HOURS;
+	arr[1] = (uint8_t) min;
+	arr[2] = (uint8_t) seconds;
+}
+
 void read_data_time_DS3231 (uint8_t* data){
 	uint8_t pData[19] = {0};
 	HAL_I2C_Mem_Read(& hi2c1, RTC_i2c_addr, 0x00, 1, pData, 7, 100);
@@ -95,6 +116,7 @@ void read_data_time_DS3231 (uint8_t* data){
 	data [2]  = ((pData[4] & 0xF0)>>4)*10 + (pData[4] & 0x0F);    // D
 	data [1]  = ((pData[5] & 0x10)>>4)*10 + (pData[5] & 0x0F);    // M
 	data [0]  = ((pData[6] & 0xF0)>>4)*10 + (pData[6] & 0x0F);    // Y
+
 }
 
 

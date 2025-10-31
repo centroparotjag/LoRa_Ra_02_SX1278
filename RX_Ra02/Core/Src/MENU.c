@@ -31,6 +31,10 @@ extern uint8_t m_counter;
 extern uint8_t LoRa_RxBuffer[7];
 extern uint8_t LoRa_receive_data;
 extern int myLoRa;
+extern uint32_t sec_time;
+extern uint32_t RX_fix_time_sec;
+
+
 void MENU_SELEKTOR (void){
 	//------------ return to MENU_SET (1) -------------
 	if (state_but == 0x02 && MENU != 0 && MENU != 1 && MENU != 5) {
@@ -53,13 +57,16 @@ void MENU_SELEKTOR (void){
 		MENU_update = 1;
 		MENU_stage = 0;
 		state_but = 8;
+		LoRa_receive_data = 1;
 	}
 
+
+	if (MENU == 0){
+		RTC_view = 1;
+		MENU_O ();
+	}
     if(MENU_update == 1){
-    	if (MENU == 0){
-    		RTC_view = 1;
-    		MENU_O ();
-    	}
+
     	if (MENU == 1){			// selektor - menu
     		RTC_view = 1;
     		MENU_SET ();
@@ -164,65 +171,118 @@ void MENU_SET (void){
 
 
 void MENU_O (void){
-	background_color = RGB565(34,139,34);
+	char buff[24];
+	background_color 		  = RGB565(128,128,0);
+	uint16_t frame_color      = RGB565(189,183,107);
+	uint16_t frame_fill_color = RGB565(85,107,47);
+	uint16_t col_t = GREEN;
+	uint16_t col_h = GREEN;
+	uint16_t col_V = GREEN;
+
 	if(MENU_stage == 0){
 		MENU_stage = 1;
 		ST7789_FillScreen(background_color);
-		ST7789_DrawLine(0, 25, 239, 25, YELLOW);
+		//------------------------
+		ST7789_DrawRectangleFilled(0, 25, 239, 135, frame_fill_color);
+		ST7789_DrawRectangle(0, 25, 239, 135, frame_color);
+		ST7789_DrawRectangle(1, 26, 238, 134, frame_color);
+		ST7789_DrawRectangle(2, 27, 237, 133, frame_color);
 
-		uint16_t c_color = RGB565(60,165,60);
-		ST7789_DrawString_10x16_background(90, 110, "MENU 0", c_color, background_color);
+		ST7789_DrawLine(0, 65,  239, 65, frame_color);
+		ST7789_DrawLine(0, 66,  239, 66, frame_color);
 
-		ST7789_DrawString_26x30_background (0, 170, "-23.57gC",  GREEN, background_color);
+		ST7789_DrawLine(0, 105, 239, 105, frame_color);
+		ST7789_DrawLine(0, 106, 239, 106, frame_color);
+
+		ST7789_DrawLine(44, 105, 44, 135, frame_color);
+		ST7789_DrawLine(45, 105, 45, 135, frame_color);
+
+		ST7789_DrawLine(145, 105, 145, 135, frame_color);
+		ST7789_DrawLine(146, 105, 146, 135, frame_color);
+
+		ST7789_DrawString_10x16_background(40, 77, "WAITING FOR DATA", WHITE, frame_fill_color);
+
+
 	}
 
 
 	if (LoRa_receive_data == 1){
-		HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_SET);   // power hold - enabled
+		//-------------------------------------------------------------------------------------------------
 		LoRa_receive_data = 0;
-		char buff[24];
-		ST7789_DrawString_10x16_background(10, 220, "RX  ", RED, background_color);
 
+		ST7789_DrawRectangleFilled(4, 108, 43, 132, RED);
+		ST7789_DrawString_10x16_background(15, 111, "RX", YELLOW, RED);
 
 		//-------------------- decoding data ----------------------------
 		uint8_t DecodedDataPacket[7]={0};
 		uint8_t CRC_check = DecodingAndVerificationOfDataPacket (LoRa_RxBuffer, DecodedDataPacket);
 
-//      //------------ full damp -----------------------------------------------
-//		uint8_t y=30;
-//		for(uint8_t i = 0; i<8; ++i){
-//			sprintf(buff, "%02X %02X %02X %02X %02X %02X %02X %02X", LoRa_RxBuffer[i*8+0], LoRa_RxBuffer[i*8+1], LoRa_RxBuffer[i*8+2], LoRa_RxBuffer[i*8+3],
-//																	 LoRa_RxBuffer[i*8+4], LoRa_RxBuffer[i*8+5], LoRa_RxBuffer[i*8+6], LoRa_RxBuffer[i*8+7]);
-//			ST7789_DrawString_10x16_background(5, y, buff, WHITE, background_color);
-//			y+=20;
-//		}
-		//------------- convert raw data to T, h----------------------------------
-		uint16_t temp_raw = 0;
-		uint16_t hum_raw  = 0;
+		if (CRC_check == 1){
+			//------------- convert raw data to T, h----------------------------------
+			uint16_t temp_raw = 0;
+			uint16_t hum_raw  = 0;
 
-		temp_raw |= DecodedDataPacket[0]<<8 | DecodedDataPacket[1];
-		hum_raw  |= DecodedDataPacket[2]<<8 | DecodedDataPacket[3];
+			temp_raw |= DecodedDataPacket[0]<<8 | DecodedDataPacket[1];
+			hum_raw  |= DecodedDataPacket[2]<<8 | DecodedDataPacket[3];
 
-		float temperature = (175.0f * ((float)temp_raw / 65535.0f)) - 45.0f;
-		float humidity = 100.0f * ((float)hum_raw / 65535.0f);
-		float Vbat = (DecodedDataPacket[4]+250.0f)/100.0f;
+			float temperature = (175.0f * ((float)temp_raw / 65535.0f)) - 45.0f;
+			float humidity = 100.0f * ((float)hum_raw / 65535.0f);
+			float Vbat = (DecodedDataPacket[4]+250.0f)/100.0f;
 
-		sprintf (buff, "T = %.2f, h = %.2f     " , temperature, humidity);
-		ST7789_DrawString_10x16_background(5, 50, buff, GREEN, background_color);
+			//-------------------------------------------------------------------
+			if(temperature>=28) 				{ col_t = YELLOW; }
+			if(temperature<15)  				{ col_t = CYAN;   }
+			if(humidity>=65)    				{ col_h = CYAN;   }
+			if(humidity<45)     				{ col_h = YELLOW; }
 
-		sprintf (buff, "Vbat = %.2f; CRC=%d" , Vbat, CRC_check);
-		ST7789_DrawString_10x16_background(5, 70, buff, GREEN, background_color);
+			//---- T aligned -----------
+			if(temperature <=-10 )	{sprintf (buff, "%.2f" , temperature);}
+			if((temperature >-10 && temperature < 0) || temperature >= 10) {sprintf (buff, " %.2f" , temperature);}
+			if(temperature >=0 && temperature < 10 ) {sprintf (buff, "  %.2f" , temperature);}
 
-		//-------------- raw data ---------------------
-		ST7789_DrawString_10x16_background(10, 220, "WAIT", GREEN, background_color);
-		HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_RESET);   // power hold - disabled
+			ST7789_DrawString_26x30_background (10, 33, buff,  col_t, frame_fill_color);
+			ST7789_DrawString_26x30_background (176, 33, "gC",  col_t, frame_fill_color);
+			//-----------------------
 
+			//---- h aligned -----------
+			if(humidity <10) {
+				sprintf (buff, " %.2f%%" , humidity);
+			}
+			else {
+				sprintf (buff, "%.2f%%" , humidity);
+			}
+			ST7789_DrawString_26x30_background (40, 73, buff,  col_h, frame_fill_color);
 
-		test_encoding_decoding_data ();
+			//------ battery voltage -------------
+			if(Vbat < (BATT_LOW_VOLTAGE+0.2) )  {
+				sprintf (buff, "Low %.2fV" , Vbat);
+				ST7789_DrawString_10x16_background(52, 111, buff, RED, frame_fill_color);
+			 }
+			else {
+				sprintf (buff, "  %.2fV  " , Vbat);
+				ST7789_DrawString_10x16_background(52, 111, buff, GREEN, frame_fill_color);
+			}
+			//-------------------------------------------------------------------------------------------------
+			//ST7789_DrawString_10x16_background(15, 110, "  ", GREEN, frame_fill_color);
+			ST7789_DrawRectangleFilled(4, 108, 43, 132, frame_fill_color);		// clear "RX"
 
+		}
 	}
 
+	//------- time after last data reception -----------------------------------------------------------
+	if (RX_fix_time_sec == 0) {
+		RX_fix_time_sec = sec_time;
+	}
 
+	if(sec_time < RX_fix_time_sec){
+		RX_fix_time_sec = sec_time;
+	}
+
+	uint32_t sec = sec_time - RX_fix_time_sec;
+	uint8_t Hms[3]={0};
+	convert_time_sec_to_H_m_s (sec, Hms);
+	sprintf (buff, "%02d:%02d:%02d", Hms[0], Hms[1], Hms[2]);
+	ST7789_DrawString_10x16_background(153, 111, buff, col_V, frame_fill_color);
 }
 
 void MENU_STAT (void){
@@ -253,47 +313,51 @@ void MENU_STAT (void){
 		ST7789_DrawLine(0, 26, 239, 26, outline_color);
 		//-----------------------------------------------
 
-		ST7789_DrawRectangleFilled(0, 35, 239, 85, main_color);
-		ST7789_DrawRectangle(0, 35, 239, 85, outline_color);
-		ST7789_DrawString_10x16_background(40, 40, "POWER-ON COUNTER", WHITE, main_color);
+		ST7789_DrawRectangleFilled(0, 35, 239, 60, main_color);
+		ST7789_DrawRectangle(0, 35, 239, 60, outline_color);
+		ST7789_DrawString_10x16_background(5, 40, "p.o.c.", WHITE, main_color);
 
-		ST7789_DrawRectangleFilled(0, 100, 239, 150, main_color);
-		ST7789_DrawRectangle(0, 100, 239, 150, outline_color);
-		ST7789_DrawString_10x16_background(50, 105, "WORKING TIMES", WHITE, main_color);
+		ST7789_DrawRectangleFilled(0, 70, 239, 95, main_color);
+		ST7789_DrawRectangle(0, 70, 239, 95, outline_color);
+		ST7789_DrawString_10x16_background(5, 75, "w.t.", WHITE, main_color);
+
+		ST7789_DrawRectangleFilled(0, 105, 239, 130, main_color);
+		ST7789_DrawRectangle(0, 105, 239, 130, outline_color);
+		ST7789_DrawString_10x16_background(5, 110, "rx.B.", WHITE, main_color);
 
 		ST7789_DrawRectangleFilled(0, 165, 239, 239, main_color);
 		ST7789_DrawRectangle(0, 165, 239, 239, outline_color);
-		ST7789_DrawString_10x16_background(100, 170, "FRAM", WHITE, main_color);
+		//ST7789_DrawString_10x16_background(100, 170, "FRAM", WHITE, main_color);
 	}
 
 
 	uint32_t power_on_counter = read_fram_count_init ();
 	uint32_t working_times    = read_fram_count_time_on ();
+	uint32_t received_byte    = read_fram_received_byte_counter ();
 
 	h = working_times / 60;
 	m = working_times%60;
 
 	//-------------------------------------------------------------------------
 	sprintf (buff, "%d", power_on_counter);
-	int8_t Xc=120;
-	if(power_on_counter >= 10000 && power_on_counter < 100000 ){ Xc=80; }
-	if(power_on_counter >= 100000 ){ Xc=50; }
-
-	ST7789_DrawString_10x16_background(Xc, 60, buff, YELLOW, main_color);
+	ST7789_DrawString_10x16_background(70, 40, buff, YELLOW, main_color);
 
 	sprintf (buff, "%dh %02dm", h, m);
-	int8_t Xh=90;
-	if(h >= 1000  && h < 10000 ){ Xh=70; }
-	if(h >= 10000 && h < 100000 ){ Xc=60; }
-	if(h > 100000 ){ Xc=50; }
+	ST7789_DrawString_10x16_background(70, 75, buff, YELLOW, main_color);
 
-	ST7789_DrawString_10x16_background(Xh, 125, buff, YELLOW, main_color);
+	sprintf (buff, "%d", received_byte);
+	ST7789_DrawString_10x16_background(70, 110, buff, YELLOW, main_color);
+
+
 	//-------------------------------------------------------------------------
 	sprintf (buff, "p.o.c. 0x%08X", power_on_counter);
-	ST7789_DrawString_10x16_background(30, 190, buff, WHITE, main_color);
+	ST7789_DrawString_10x16_background(30, 175, buff, WHITE, main_color);
 
 	sprintf (buff, "w.t.   0x%08X", working_times);
-	ST7789_DrawString_10x16_background(30, 210, buff, WHITE, main_color);
+	ST7789_DrawString_10x16_background(30, 195, buff, WHITE, main_color);
+
+	sprintf (buff, "rx.B.  0x%08X", received_byte);
+	ST7789_DrawString_10x16_background(30, 215, buff, WHITE, main_color);
 
 }
 
