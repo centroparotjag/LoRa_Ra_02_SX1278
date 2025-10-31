@@ -268,6 +268,10 @@ void MENU_O (void){
 			ST7789_DrawRectangleFilled(4, 108, 43, 132, frame_fill_color);		// clear "RX"
 
 		}
+		else {
+			ST7789_DrawRectangleFilled(4, 108, 43, 132, RED);
+			ST7789_DrawString_10x16_background(7, 111, "CRC", YELLOW, RED);
+		}
 	}
 
 	//------- time after last data reception -----------------------------------------------------------
