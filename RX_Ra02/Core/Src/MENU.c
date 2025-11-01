@@ -8,6 +8,7 @@
 #include "MENU.h"
 #include "stm32f4xx_hal.h"
 #include "DS3231.h"
+#include "DS18B20.h"
 #include "config.h"
 #include "display.h"
 #include <st7789.h>
@@ -33,8 +34,9 @@ extern uint8_t LoRa_receive_data;
 extern int myLoRa;
 extern uint32_t sec_time;
 extern uint32_t RX_fix_time_sec;
+float TMP_ds18b20 = 0;
 
-
+uint8_t flag_status_read_T_DS18B20 = 0;
 void MENU_SELEKTOR (void){
 	//------------ return to MENU_SET (1) -------------
 	if (state_but == 0x02 && MENU != 0 && MENU != 1 && MENU != 5) {
@@ -93,6 +95,32 @@ void MENU_SELEKTOR (void){
     	}
     	MENU_update = 0;
     }
+
+
+	//-------- read T DS18B20------------------------
+    uint32_t count_sec_cicle = sec_time - RX_fix_time_sec;
+	if (count_sec_cicle%60 == 2){
+		Power_DS18B20 (1);
+		flag_status_read_T_DS18B20 = 1;
+	}
+	if (count_sec_cicle%60 == 3 && flag_status_read_T_DS18B20 == 1){
+		START__DS18B20_CONVERT_TEMPERATURE ();
+		flag_status_read_T_DS18B20 = 2;
+	}
+	if (count_sec_cicle%60 == 4 && flag_status_read_T_DS18B20 == 2){
+		uint16_t T_DS18B20 = READ_DS18B20_TEMPERATURE ();
+		Power_DS18B20 (0);
+		flag_status_read_T_DS18B20 = 0;
+		if(T_DS18B20 <= 0x07D0){
+			TMP_ds18b20 = T_DS18B20/16.0f;
+		}
+		else {
+			TMP_ds18b20 = ((0x10000-T_DS18B20)/16.0f)*(-1);
+		}
+
+	}
+	//-----------------------------------------------
+
 }
 
 
@@ -270,8 +298,9 @@ void MENU_O (void){
 		}
 		else {
 			ST7789_DrawRectangleFilled(4, 108, 43, 132, RED);
-			ST7789_DrawString_10x16_background(7, 111, "CRC", YELLOW, RED);
+			ST7789_DrawString_10x16_background(10, 111, "CRC", YELLOW, RED);
 		}
+
 	}
 
 	//------- time after last data reception -----------------------------------------------------------
@@ -288,6 +317,10 @@ void MENU_O (void){
 	convert_time_sec_to_H_m_s (sec, Hms);
 	sprintf (buff, "%02d:%02d:%02d", Hms[0], Hms[1], Hms[2]);
 	ST7789_DrawString_10x16_background(153, 111, buff, col_V, frame_fill_color);
+
+	//====================== On board meteo ====================================
+	sprintf (buff, "T=%.2f C" , TMP_ds18b20);
+	ST7789_DrawString_10x16_background(10, 190, buff, WHITE, frame_fill_color);
 }
 
 void MENU_STAT (void){

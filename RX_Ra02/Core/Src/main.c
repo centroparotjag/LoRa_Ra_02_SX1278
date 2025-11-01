@@ -28,12 +28,14 @@
 #include "Ra_02_LORA.h"
 #include "other functions.h"
 #include "DS3231.h"
+#include "DS18B20.h"
 #include "adc.h"
 #include "MENU.h"
 #include "display.h"
 #include "SHT30.h"
 #include "Ra_02_LORA.h"
 #include "fram.h"
+#include "data_encoding.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,6 +63,7 @@ SPI_HandleTypeDef hspi1;
 SPI_HandleTypeDef hspi2;
 
 TIM_HandleTypeDef htim4;
+TIM_HandleTypeDef htim10;
 
 osThreadId defaultTaskHandle;
 osThreadId myTask_BUTTONHandle;
@@ -90,6 +93,7 @@ static void MX_SPI1_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_TIM10_Init(void);
 void StartDefaultTask(void const * argument);
 void StartTask_BUTTON(void const * argument);
 
@@ -137,12 +141,20 @@ int main(void)
   MX_SPI2_Init();
   MX_ADC1_Init();
   MX_TIM4_Init();
+  MX_TIM10_Init();
   /* USER CODE BEGIN 2 */
   ST7789_Init(240, 240);
   power_on_displayed ();
   convert_adc_3ch ();
   SHT30_heater (1);
   read_fram_count_init ();			// Don't remove
+
+
+  Power_DS18B20 (1);
+  HAL_Delay(5);
+  TEST_AND_WRITE_DEFAULT_SRAM ();	// DS18B20
+
+
   // MODULE SETTINGS ----------------------------------------------
   myLoRa = newLoRa();
 
@@ -498,6 +510,37 @@ static void MX_TIM4_Init(void)
 }
 
 /**
+  * @brief TIM10 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM10_Init(void)
+{
+
+  /* USER CODE BEGIN TIM10_Init 0 */
+
+  /* USER CODE END TIM10_Init 0 */
+
+  /* USER CODE BEGIN TIM10_Init 1 */
+
+  /* USER CODE END TIM10_Init 1 */
+  htim10.Instance = TIM10;
+  htim10.Init.Prescaler = 96;
+  htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim10.Init.Period = 65535;
+  htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim10.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim10) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM10_Init 2 */
+  HAL_TIM_Base_Start(&htim10);
+  /* USER CODE END TIM10_Init 2 */
+
+}
+
+/**
   * Enable DMA controller clock
   */
 static void MX_DMA_Init(void)
@@ -538,10 +581,11 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, adc_cir_0V_Pin|res_Ra02_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(res_IPS_GPIO_Port, res_IPS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, res_IPS_Pin|POW_DS18B20_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, dc_IPS_Pin|pow_hold_Pin|cs_Ra02_Pin|cs_flash_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOB, dc_IPS_Pin|pow_hold_Pin|cs_Ra02_Pin|cs_flash_Pin
+                          |DQ_DS18B20_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : led_button_Pin */
   GPIO_InitStruct.Pin = led_button_Pin;
@@ -597,11 +641,25 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(pow_button_GPIO_Port, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : POW_DS18B20_Pin */
+  GPIO_InitStruct.Pin = POW_DS18B20_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(POW_DS18B20_GPIO_Port, &GPIO_InitStruct);
+
   /*Configure GPIO pins : enc_up_Pin enc_button_Pin enc_down_Pin */
   GPIO_InitStruct.Pin = enc_up_Pin|enc_button_Pin|enc_down_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : DQ_DS18B20_Pin */
+  GPIO_InitStruct.Pin = DQ_DS18B20_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  HAL_GPIO_Init(DQ_DS18B20_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
@@ -619,14 +677,18 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	if(GPIO_Pin == myLoRa.DIO0_pin){
 		HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_SET);   // led button on
 		LoRa_receive(&myLoRa, LoRa_RxBuffer, 7);
-		write_fram_received_byte_counter ();
-		LoRa_receive_data = 1;
-		RX_fix_time_sec = sec_time;
+
+		uint8_t CRC_check = fast_CRC_check (LoRa_RxBuffer);
+
+		if(CRC_check == 1){
+			write_fram_received_byte_counter ();
+			RX_fix_time_sec = sec_time;
+			LoRa_receive_data = 1;
+		}
 
 		if (MENU == 0){
 			MENU_update = 1;
 		}
-		HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_RESET);  // led button off
 	}
 }
 
@@ -649,8 +711,7 @@ void StartDefaultTask(void const * argument)
   {
 	osDelay(955);
 	displayed_data_time_DS3231 (background_color, RTC_view);
-
-
+	HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_RESET);  // led button off
   }
   /* USER CODE END 5 */
 }

@@ -15,6 +15,7 @@ void encoding_decoding_data (uint8_t key_init, uint8_t* data_in, uint8_t* data_o
 uint8_t encoding_key_init (uint8_t key_cnt);
 uint8_t decoding_key_init (uint8_t key_init_encoded);
 uint8_t DecodingAndVerificationOfDataPacket (uint8_t* DATA_RAW, uint8_t* DecodedDataPacket);
+uint8_t fast_CRC_check (uint8_t* DATA_RAW);
 void test_encoding_decoding_data (void);
 
 

@@ -70,6 +70,14 @@ uint8_t DecodingAndVerificationOfDataPacket (uint8_t* DATA_RAW, uint8_t* Decoded
 	return 0;
 }
 
+uint8_t fast_CRC_check (uint8_t* DATA_RAW){
+	//--------------- check CRC -------------------------------
+	uint8_t CRC_calc = calculate_crc8_coding(DATA_RAW, 6);
+	if(CRC_calc == DATA_RAW[6]){
+		return 1;
+	}
+	return 0;
+}
 
 //===================== test ===================================================
 

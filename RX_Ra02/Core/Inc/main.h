@@ -86,12 +86,16 @@ void Error_Handler(void);
 #define res_Ra02_GPIO_Port GPIOA
 #define pow_button_Pin GPIO_PIN_9
 #define pow_button_GPIO_Port GPIOA
+#define POW_DS18B20_Pin GPIO_PIN_10
+#define POW_DS18B20_GPIO_Port GPIOA
 #define enc_up_Pin GPIO_PIN_3
 #define enc_up_GPIO_Port GPIOB
 #define enc_button_Pin GPIO_PIN_4
 #define enc_button_GPIO_Port GPIOB
 #define enc_down_Pin GPIO_PIN_5
 #define enc_down_GPIO_Port GPIOB
+#define DQ_DS18B20_Pin GPIO_PIN_9
+#define DQ_DS18B20_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

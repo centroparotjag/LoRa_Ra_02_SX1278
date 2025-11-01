@@ -65,6 +65,8 @@ void displayed_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 		MENU_update = 1;
 	}
 
+
+
 	if (displayed == 1){
 		sprintf (buff, "%02d-%02d-%02d  %02d:%02d:%02d", d, M, Y, H, m, s);
 		ST7789_DrawString_10x16_background(50, 2, buff, YELLOW, background_color);
