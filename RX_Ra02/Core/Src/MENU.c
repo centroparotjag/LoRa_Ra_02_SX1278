@@ -35,6 +35,9 @@ extern int myLoRa;
 extern uint32_t sec_time;
 extern uint32_t RX_fix_time_sec;
 float TMP_ds18b20 = 0;
+extern float humidity_on_board;
+float T_ob_fix = 1;
+float H_ob_fix = 1;
 
 uint8_t flag_status_read_T_DS18B20 = 0;
 void MENU_SELEKTOR (void){
@@ -60,6 +63,8 @@ void MENU_SELEKTOR (void){
 		MENU_stage = 0;
 		state_but = 8;
 		LoRa_receive_data = 1;
+		T_ob_fix = 100;
+		H_ob_fix = 100;
 	}
 
 
@@ -117,6 +122,7 @@ void MENU_SELEKTOR (void){
 		else {
 			TMP_ds18b20 = ((0x10000-T_DS18B20)/16.0f)*(-1);
 		}
+		MENU_update = 1;
 
 	}
 	//-----------------------------------------------
@@ -198,11 +204,18 @@ void MENU_SET (void){
 }
 
 
+
+
 void MENU_O (void){
 	char buff[24];
-	background_color 		  = RGB565(80,80,80);
-	uint16_t frame_color      = RGB565(128,128,128);
-	uint16_t frame_fill_color = RGB565(105,105,105);
+	background_color 		  	 = RGB565(0, 34, 51);
+
+	uint16_t frame_color      	 = RGB565(170, 170, 85);
+	uint16_t frame_fill_color 	 = RGB565(85, 85, 43);
+
+	uint16_t frame_color_ob      = RGB565(170, 170, 85);
+	uint16_t frame_fill_color_ob = RGB565(85, 85, 43);
+
 	uint16_t col_t = GREEN;
 	uint16_t col_h = GREEN;
 	uint16_t col_V = GREEN;
@@ -210,7 +223,7 @@ void MENU_O (void){
 	if(MENU_stage == 0){
 		MENU_stage = 1;
 		ST7789_FillScreen(background_color);
-		//------------------------
+		//----------- extern data -------
 		ST7789_DrawRectangleFilled(0, 25, 239, 135, frame_fill_color);
 		ST7789_DrawRectangle(0, 25, 239, 135, frame_color);
 		ST7789_DrawRectangle(1, 26, 238, 134, frame_color);
@@ -231,7 +244,14 @@ void MENU_O (void){
 		ST7789_DrawString_10x16_background(80, 37, "NO DATA", RGB565(150,150,150), frame_fill_color);
 		ST7789_DrawString_10x16_background(40, 77, "WAITING FOR DATA", RGB565(150,150,150), frame_fill_color);
 
+		//----------- on board data -------
+		ST7789_DrawRectangleFilled(0, 150, 239, 239, frame_fill_color_ob);
+		ST7789_DrawRectangle(0, 150, 239, 239, frame_color_ob);
+		ST7789_DrawRectangle(1, 149, 238, 238, frame_color_ob);
+		ST7789_DrawRectangle(2, 148, 237, 237, frame_color_ob);
 
+		ST7789_DrawLine(0, 194,  239, 194, frame_color_ob);
+		ST7789_DrawLine(0, 195,  239, 195, frame_color_ob);
 	}
 
 
@@ -261,8 +281,8 @@ void MENU_O (void){
 			//-------------------------------------------------------------------
 			if(temperature>=28) 				{ col_t = YELLOW; }
 			if(temperature<15)  				{ col_t = CYAN;   }
-			if(humidity>=65)    				{ col_h = CYAN;   }
-			if(humidity<45)     				{ col_h = YELLOW; }
+			if(humidity>=65)    				{ col_h = YELLOW;   }
+			if(humidity<45)     				{ col_h = CYAN; }
 
 			//---- T aligned -----------
 			if(temperature <=-10 )	{sprintf (buff, "%.2f" , temperature);}
@@ -297,8 +317,8 @@ void MENU_O (void){
 
 		}
 		else {
-			ST7789_DrawRectangleFilled(4, 108, 43, 132, RED);
-			ST7789_DrawString_10x16_background(10, 111, "CRC", YELLOW, RED);
+//			ST7789_DrawRectangleFilled(4, 108, 43, 132, RED);
+//			ST7789_DrawString_10x16_background(10, 111, "CRC", YELLOW, RED);
 		}
 
 	}
@@ -319,8 +339,43 @@ void MENU_O (void){
 	ST7789_DrawString_10x16_background(153, 111, buff, col_V, frame_fill_color);
 
 	//====================== On board meteo ====================================
-	sprintf (buff, "T=%.2f C" , TMP_ds18b20);
-	ST7789_DrawString_10x16_background(10, 190, buff, WHITE, frame_fill_color);
+//	sprintf (buff, "T=%.2f C" , TMP_ds18b20);
+//	ST7789_DrawString_10x16_background(10, 190, buff, WHITE, frame_fill_color);
+
+	if(MENU_update == 1){
+		//-------------------------------------------------------------------
+		uint16_t col_t_OB = GREEN;
+		uint16_t col_h_OB = GREEN;
+
+		if(TMP_ds18b20>=28) 				{ col_t_OB = YELLOW; }
+		if(TMP_ds18b20<15)  				{ col_t_OB = CYAN;   }
+		if(humidity_on_board>=65)    		{ col_h_OB = YELLOW;   }
+		if(humidity_on_board<45)     		{ col_h_OB = CYAN; }
+
+		//---- T aligned -----------
+
+		if(T_ob_fix != TMP_ds18b20) {
+			if(TMP_ds18b20 <=-10 )	{sprintf (buff, "%.2f" , TMP_ds18b20);}
+			if((TMP_ds18b20 >-10 && TMP_ds18b20 < 0) || TMP_ds18b20 >= 10) {sprintf (buff, " %.2f" , TMP_ds18b20);}
+			if(TMP_ds18b20 >=0 && TMP_ds18b20 < 10 ) {sprintf (buff, "  %.2f" , TMP_ds18b20);}
+
+			ST7789_DrawString_26x30_background (10,  160, buff,  col_t_OB, frame_fill_color_ob);
+			ST7789_DrawString_26x30_background (176, 160, "gC",  col_t_OB, frame_fill_color_ob);
+			T_ob_fix = TMP_ds18b20;
+		}
+
+		//---- h aligned -----------
+		if(H_ob_fix != humidity_on_board){
+			if(humidity_on_board <10) {
+				sprintf (buff, " %.2f%%" , humidity_on_board);
+			}
+			else {
+				sprintf (buff, "%.2f%%" , humidity_on_board);
+			}
+			ST7789_DrawString_26x30_background (40, 204, buff,  col_h_OB, frame_fill_color_ob);
+			H_ob_fix = humidity_on_board;
+		}
+	}
 }
 
 void MENU_STAT (void){

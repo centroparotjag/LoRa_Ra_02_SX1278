@@ -15,6 +15,7 @@
 
 #include "st7789.h"
 
+float humidity_on_board = 0;
 
 extern I2C_HandleTypeDef hi2c1;
 extern uint8_t MENU_stage;
@@ -125,8 +126,8 @@ extern uint16_t background_color;
 
 void displayed_t_h (void){
 	float temperature =0;
-	float humidity = 0;
-	uint8_t crc_status = mesurement_t_h_SHT30 (& temperature, & humidity);
+
+	uint8_t crc_status = mesurement_t_h_SHT30 (& temperature, & humidity_on_board);
 	background_color = RGB565(95,158,160);
 
 	if(MENU_stage == 0){
@@ -137,7 +138,7 @@ void displayed_t_h (void){
 
 
 	char buff [24] = {0};
-	sprintf (buff, "T = %.2f  h = %.2f   " , temperature, humidity);
+	sprintf (buff, "T = %.2f  h = %.2f   " , temperature, humidity_on_board);
 	ST7789_DrawString_10x16_background(5, 45, buff, GREEN, background_color);
 
 

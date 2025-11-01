@@ -146,7 +146,7 @@ int main(void)
   ST7789_Init(240, 240);
   power_on_displayed ();
   convert_adc_3ch ();
-  SHT30_heater (1);
+  SHT30_heater (0);
   read_fram_count_init ();			// Don't remove
 
 

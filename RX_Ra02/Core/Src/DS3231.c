@@ -18,6 +18,7 @@
 
 extern I2C_HandleTypeDef hi2c1;
 extern uint8_t MENU_update;
+extern float humidity_on_board;
 uint8_t flag_once_wr_count_init = 0;
 uint32_t sec_time = 0;
 
@@ -63,12 +64,14 @@ void displayed_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 	if (s%10 == 0){
 		convert_adc_3ch ();
 		MENU_update = 1;
+		float temperature;
+		mesurement_t_h_SHT30 (& temperature, & humidity_on_board);
 	}
 
 
 
 	if (displayed == 1){
-		sprintf (buff, "%02d-%02d-%02d  %02d:%02d:%02d", d, M, Y, H, m, s);
+		sprintf (buff, "%02d-%02d-%02d  %02d:%02d:%02d ", d, M, Y, H, m, s);
 		ST7789_DrawString_10x16_background(50, 2, buff, YELLOW, background_color);
 
 		switch (w) {
