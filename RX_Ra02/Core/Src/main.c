@@ -709,7 +709,7 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-	osDelay(955);
+	osDelay(938);				// 955
 	displayed_data_time_DS3231 (background_color, RTC_view);
 	HAL_GPIO_WritePin(led_button_GPIO_Port, led_button_Pin, GPIO_PIN_RESET);  // led button off
   }
