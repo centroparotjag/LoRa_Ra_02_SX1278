@@ -148,12 +148,13 @@ int main(void)
   convert_adc_3ch ();
   SHT30_heater (0);
   read_fram_count_init ();			// Don't remove
-
-
   Power_DS18B20 (1);
   HAL_Delay(5);
   TEST_AND_WRITE_DEFAULT_SRAM ();	// DS18B20
 
+  //-------- erase fram - statistic ------------------
+  //fram_erase_full ();
+  //-----------------------------------------------
 
   // MODULE SETTINGS ----------------------------------------------
   myLoRa = newLoRa();
