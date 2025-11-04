@@ -157,9 +157,6 @@ uint8_t displaying_images_from_flash (void){
 	if(!signature_and_data_search ()){
 		return 0;		// images not found
 	}
-
-	//ST7789_FillScreen(background_color);
-
 	//---------- Displaying an image from a flash drive to the display ---------------
 	for (uint8_t y = 0; y < 240; ++y){
 		x=239;
@@ -178,9 +175,6 @@ uint8_t displaying_images_from_flash (void){
 		}
 
 	}
-	//--------------------------------------------------------------------------------
-	//HAL_Delay(1000);
-	//ST7789_FillScreen(BLACK);
 	return 1;				// Everything is done well.
 }
 

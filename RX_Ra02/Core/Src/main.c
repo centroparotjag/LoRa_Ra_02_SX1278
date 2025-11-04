@@ -211,7 +211,7 @@ int main(void)
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of myTask_BUTTON */
-  osThreadDef(myTask_BUTTON, StartTask_BUTTON, osPriorityAboveNormal, 0, 512);
+  osThreadDef(myTask_BUTTON, StartTask_BUTTON, osPriorityBelowNormal, 0, 512);
   myTask_BUTTONHandle = osThreadCreate(osThread(myTask_BUTTON), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -529,7 +529,7 @@ static void MX_TIM10_Init(void)
   htim10.Init.Prescaler = 96;
   htim10.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim10.Init.Period = 65535;
-  htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim10.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
   htim10.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim10) != HAL_OK)
   {
@@ -663,7 +663,7 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(DQ_DS18B20_GPIO_Port, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI2_IRQn, 5, 0);
+  HAL_NVIC_SetPriority(EXTI2_IRQn, 6, 0);
   HAL_NVIC_EnableIRQ(EXTI2_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */

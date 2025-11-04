@@ -63,9 +63,9 @@ void displayed_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 
 	if (s%10 == 0){
 		convert_adc_3ch ();
-		MENU_update = 1;
 		float temperature;
 		mesurement_t_h_SHT30 (& temperature, & humidity_on_board);
+		MENU_update = 1;
 	}
 
 

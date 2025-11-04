@@ -21,6 +21,8 @@ extern I2C_HandleTypeDef hi2c1;
 extern uint8_t MENU_stage;
 extern uint8_t RTC_view;
 
+extern  defaultTaskHandle;
+
 // Function to calculate CRC-8/NRSC-5
 uint8_t calculate_crc8_nrsc5(const uint8_t *data, size_t length) {
     uint8_t crc = 0xFF; // Initial CRC value
@@ -49,10 +51,10 @@ void SHT30_heater (uint8_t onoff){
 	uint8_t heater_disable_cmd[2]	= {0x30, 0x66};
 
 	if (onoff == 0){
-		HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, heater_disable_cmd, 2, 100);
+		HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, heater_disable_cmd, 2, 500);
 	}
 	else {
-		HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, heater_enable_cmd, 2, 100);
+		HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, heater_enable_cmd, 2, 500);
 	}
 }
 
@@ -60,11 +62,11 @@ uint16_t SHT30_read_status_reg (void){
 	uint8_t read_status_reg_cmd[2]	= {0xF3, 0x2D};
 	uint16_t status_reg = 0;
 
-	HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, read_status_reg_cmd, 2, 100);
+	HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, read_status_reg_cmd, 2, 500);
 	HAL_Delay(16);
 
 	uint8_t pData[3] = {0};
-	HAL_I2C_Master_Receive(& hi2c1, SHT30_i2c_addr, pData, 3, 100);
+	HAL_I2C_Master_Receive(& hi2c1, SHT30_i2c_addr, pData, 3, 500);
 
 	// CRC check
 	uint8_t data_t_crc[2] = {pData[0], pData[1]};
@@ -88,15 +90,15 @@ uint8_t mesurement_t_h_SHT30 (float* temperature, float* humidity){
 	//--------------------------------------------------
 	uint16_t status = SHT30_read_status_reg ();
 	if ((status & 0x2000) != 0x2000){
-		HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, soft_reset_cmd, 2, 100);
+		HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, soft_reset_cmd, 2, 500);
 		HAL_Delay(2);
 	}
 
-	HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, mesurement_cmd, 2, 100);
+	HAL_I2C_Master_Transmit(& hi2c1, SHT30_i2c_addr, mesurement_cmd, 2, 500);
 	HAL_Delay(16);
 
 	uint8_t pData[6] = {0};
-	HAL_I2C_Master_Receive(& hi2c1, SHT30_i2c_addr, pData, 6, 100);
+	HAL_I2C_Master_Receive(& hi2c1, SHT30_i2c_addr, pData, 6, 500);
 
 	// CRC check
 	uint8_t data_t_crc[2] = {pData[0], pData[1]};
@@ -124,6 +126,9 @@ uint8_t mesurement_t_h_SHT30 (float* temperature, float* humidity){
 
 extern uint16_t background_color;
 
+
+
+
 void displayed_t_h (void){
 	float temperature =0;
 
@@ -131,9 +136,11 @@ void displayed_t_h (void){
 	background_color = RGB565(95,158,160);
 
 	if(MENU_stage == 0){
-		MENU_stage = 1;
+		vTaskSuspend(defaultTaskHandle);			//
 		ST7789_FillScreen(background_color);
+		//ST7789_FillScreen(background_color);
 		ST7789_DrawLine(0, 25, 239, 25, YELLOW);
+		MENU_stage = 1;
 	}
 
 
@@ -186,6 +193,7 @@ void displayed_t_h (void){
 
 
 	RTC_view = 1;
+	vTaskResume(defaultTaskHandle);
 
 }
 

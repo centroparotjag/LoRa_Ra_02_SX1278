@@ -39,6 +39,8 @@ extern float humidity_on_board;
 float T_ob_fix = 1;
 float H_ob_fix = 1;
 
+extern  defaultTaskHandle;
+
 uint8_t flag_status_read_T_DS18B20 = 0;
 void MENU_SELEKTOR (void){
 	//------------ return to MENU_SET (1) -------------
@@ -136,10 +138,11 @@ void MENU_SELEKTOR (void){
 void MENU_SET (void){
 
 	if (MENU_stage == 0){
-		MENU_stage = 1;
+		vTaskSuspend(defaultTaskHandle);
 		uint16_t color = RGB565(85,107,47);
 		background_color = color;
 		ST7789_FillScreen(color);
+		//ST7789_FillScreen(color);
 		ST7789_DrawLine(0, 22, 240, 22, YELLOW);
 		ST7789_DrawString_10x16(30, 40, "BACK", WHITE);
 		ST7789_DrawString_10x16(30, 65, "ADC", WHITE);
@@ -147,6 +150,7 @@ void MENU_SET (void){
 		ST7789_DrawString_10x16(30, 115, "STATISTICS", WHITE);
 		ST7789_DrawString_10x16(30, 140, "TIME SET", WHITE);
 		ST7789_DrawString_10x16(30, 165, "DISPLAY", WHITE);
+		MENU_stage = 1;
 	}
 
 	//---------- buttons ---------------
@@ -201,6 +205,7 @@ void MENU_SET (void){
 		}
 	}
 	RTC_view = 1;
+	vTaskResume(defaultTaskHandle);
 }
 
 
@@ -221,8 +226,9 @@ void MENU_O (void){
 	uint16_t col_V = GREEN;
 
 	if(MENU_stage == 0){
-		MENU_stage = 1;
+		vTaskSuspend(defaultTaskHandle);
 		ST7789_FillScreen(background_color);
+		//ST7789_FillScreen(background_color);
 		//----------- extern data -------
 		ST7789_DrawRectangleFilled(0, 25, 239, 135, frame_fill_color);
 		ST7789_DrawRectangle(0, 25, 239, 135, frame_color);
@@ -252,12 +258,13 @@ void MENU_O (void){
 
 		ST7789_DrawLine(0, 194,  239, 194, frame_color_ob);
 		ST7789_DrawLine(0, 195,  239, 195, frame_color_ob);
+		MENU_stage = 1;
 	}
 
 
 	if (LoRa_receive_data == 1){
 		//-------------------------------------------------------------------------------------------------
-		LoRa_receive_data = 0;
+
 
 		ST7789_DrawRectangleFilled(4, 108, 43, 132, RED);
 		ST7789_DrawString_10x16_background(15, 111, "RX", YELLOW, RED);
@@ -314,6 +321,7 @@ void MENU_O (void){
 			//-------------------------------------------------------------------------------------------------
 			//ST7789_DrawString_10x16_background(15, 110, "  ", GREEN, frame_fill_color);
 			ST7789_DrawRectangleFilled(4, 108, 43, 132, frame_fill_color);		// clear "RX"
+			LoRa_receive_data = 0;
 
 		}
 		else {
@@ -376,6 +384,7 @@ void MENU_O (void){
 			H_ob_fix = humidity_on_board;
 		}
 	}
+	vTaskResume(defaultTaskHandle);
 }
 
 void MENU_STAT (void){
@@ -388,8 +397,9 @@ void MENU_STAT (void){
 	uint16_t outline_color = RGB565(255,255,255);
 
 	if(MENU_stage == 0){
-		MENU_stage = 1;
+		vTaskSuspend(defaultTaskHandle);
 		ST7789_FillScreen(background_color);
+		//ST7789_FillScreen(background_color);
 		//read_fram_into_terminal ();		// test!!!
 
 		//-------------CIRKLE GRAFIC -----------------
@@ -421,6 +431,7 @@ void MENU_STAT (void){
 		ST7789_DrawRectangleFilled(0, 165, 239, 239, main_color);
 		ST7789_DrawRectangle(0, 165, 239, 239, outline_color);
 		//ST7789_DrawString_10x16_background(100, 170, "FRAM", WHITE, main_color);
+		MENU_stage = 1;
 	}
 
 
@@ -452,6 +463,7 @@ void MENU_STAT (void){
 	sprintf (buff, "rx.B.  0x%08X", received_byte);
 	ST7789_DrawString_10x16_background(30, 215, buff, WHITE, main_color);
 
+	vTaskResume(defaultTaskHandle);
 }
 
 uint8_t DWs, Ds, Ms, Ys, Hs, ms, ss = 0;
@@ -529,10 +541,9 @@ void MENU_RTC (void){
 	char buff [24];
 
 	if(MENU_stage == 0){
-		set_pos = 8;
-		MENU_stage = 1;
-		state_but = 8;
+		vTaskSuspend(defaultTaskHandle);
 		ST7789_FillScreen(background_color);
+		//ST7789_FillScreen(background_color);
 		//----------------- TIME ----------------------------
 
 		for(uint8_t i =0; i<5; ++i){
@@ -551,6 +562,9 @@ void MENU_RTC (void){
 		ST7789_DrawString_10x16_background(3,   42, "W.DAY DAY - MONTH -YEAR", legend_color, main_color);
 		ST7789_DrawString_10x16_background(50, 117, "HOURS : MIN  : SEC",      legend_color, main_color);
 		ST7789_DrawString_10x16_background(40, 205, "APPLY       EXIT",        text_color,   main_color);
+		set_pos = 8;
+		MENU_stage = 1;
+		state_but = 8;
 	}
 
 	//------------------ set new data time -------------------------------
@@ -651,6 +665,7 @@ void MENU_RTC (void){
 	//---------------------- POSITION ---------------------------------------------------
 	uint16_t set_color = RGB565(255,127,80);
 	draw_position (set_pos, set_color, main_color);
+	vTaskResume(defaultTaskHandle);
 }
 
 
