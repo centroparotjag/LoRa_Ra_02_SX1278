@@ -537,8 +537,8 @@ void ST7789_DrawString_5x8 (int16_t x0, int16_t y0, char * str, uint16_t color)
 
 void ST7789_DrawChar_10x16 (int16_t x0, int16_t y0, char character, uint16_t color)
 {
-	int pix = 0x01;
-	int sym = character - 0x20;
+	uint8_t pix = 0x01;
+	uint8_t sym = character - 0x20;
 	for (int16_t X= 0; X < 10; ++X) {
 		pix = 0x01;
 		for (int16_t Y= 0; Y < 8; ++Y) {
@@ -569,8 +569,8 @@ void ST7789_DrawString_10x16 (int16_t x0, int16_t y0, char * str, uint16_t color
 //---------------------------------------------------- 10x16------------------------------------------------------------------
 void ST7789_DrawChar_10x16_background (int16_t x0, int16_t y0, char character, uint16_t color, uint16_t background_color)
 {
-	int pix = 0x01;
-	int sym = character - 0x20;
+	uint8_t pix = 0x01;
+	uint8_t sym = character - 0x20;
 	for (int16_t X= 0; X < 10; ++X) {
 		pix = 0x01;
 		for (int16_t Y= 0; Y < 8; ++Y) {

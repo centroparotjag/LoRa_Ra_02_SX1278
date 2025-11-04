@@ -186,7 +186,7 @@ int main(void)
 	// START CONTINUOUS RECEIVING -----------------------------------
 	LoRa_startReceiving(&myLoRa);
 
-	//display_of_device_presence_at_startup ();
+	display_of_device_presence_at_startup ();
   /* USER CODE END 2 */
 
   /* USER CODE BEGIN RTOS_MUTEX */

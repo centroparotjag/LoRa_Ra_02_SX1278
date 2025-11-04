@@ -97,8 +97,12 @@ void MENU_SELEKTOR (void){
     		MENU_RTC ();
     	}
     	if (MENU == 6){			// DISPLAY
+    		state_but = 8;
     		RTC_view = 0;
+    		vTaskSuspend(defaultTaskHandle);
     		displaying_images_from_flash ();
+    		vTaskResume(defaultTaskHandle);
+
     	}
     	MENU_update = 0;
     }
@@ -253,8 +257,8 @@ void MENU_O (void){
 		//----------- on board data -------
 		ST7789_DrawRectangleFilled(0, 150, 239, 239, frame_fill_color_ob);
 		ST7789_DrawRectangle(0, 150, 239, 239, frame_color_ob);
-		ST7789_DrawRectangle(1, 149, 238, 238, frame_color_ob);
-		ST7789_DrawRectangle(2, 148, 237, 237, frame_color_ob);
+		ST7789_DrawRectangle(1, 151, 238, 238, frame_color_ob);
+		ST7789_DrawRectangle(2, 152, 237, 237, frame_color_ob);
 
 		ST7789_DrawLine(0, 194,  239, 194, frame_color_ob);
 		ST7789_DrawLine(0, 195,  239, 195, frame_color_ob);
@@ -307,10 +311,10 @@ void MENU_O (void){
 			else {
 				sprintf (buff, "%.2f%%" , humidity);
 			}
-			ST7789_DrawString_26x30_background (40, 73, buff,  col_h, frame_fill_color);
+			ST7789_DrawString_26x30_background (38, 73, buff,  col_h, frame_fill_color);
 
 			//------ battery voltage -------------
-			if(Vbat < (BATT_LOW_VOLTAGE+0.2) )  {
+			if(Vbat < (BATT_LOW_VOLTAGE+0.2))  {
 				sprintf (buff, "Low %.2fV" , Vbat);
 				ST7789_DrawString_10x16_background(52, 111, buff, RED, frame_fill_color);
 			 }
@@ -340,11 +344,14 @@ void MENU_O (void){
 		RX_fix_time_sec = sec_time;
 	}
 
+
+
 	uint32_t sec = sec_time - RX_fix_time_sec;
 	uint8_t Hms[3]={0};
 	convert_time_sec_to_H_m_s (sec, Hms);
+	//for(uint8_t i=0; i<24; ++i) {buff[i]=0;}
 	sprintf (buff, "%02d:%02d:%02d", Hms[0], Hms[1], Hms[2]);
-	ST7789_DrawString_10x16_background(153, 111, buff, col_V, frame_fill_color);
+	ST7789_DrawString_10x16_background(153, 111, buff, col_V, frame_fill_color);			//col_V
 
 	//====================== On board meteo ====================================
 //	sprintf (buff, "T=%.2f C" , TMP_ds18b20);
@@ -380,7 +387,7 @@ void MENU_O (void){
 			else {
 				sprintf (buff, "%.2f%%" , humidity_on_board);
 			}
-			ST7789_DrawString_26x30_background (40, 204, buff,  col_h_OB, frame_fill_color_ob);
+			ST7789_DrawString_26x30_background (38, 204, buff,  col_h_OB, frame_fill_color_ob);
 			H_ob_fix = humidity_on_board;
 		}
 	}

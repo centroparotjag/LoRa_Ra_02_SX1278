@@ -30,11 +30,13 @@ void display_of_device_presence_at_startup (void){
 	uint8_t flash = flash_W25Q64_pressence ();
 	uint8_t dev_i2c = dev_i2c_presence ();
 
-	ST7789_DrawString_10x16 (50, 20,  "FM24CL04 -", CYAN);
-	ST7789_DrawString_10x16 (50, 40,  "W25Q64   -", CYAN);
-	ST7789_DrawString_10x16 (50, 60,  "DS3231   -", CYAN);
-	ST7789_DrawString_10x16 (50, 80,  "SHT30    -", CYAN);
-	ST7789_DrawString_10x16 (50, 100, "Ra-02    -", CYAN);
+	uint16_t text_color      	 = RGB565(240,230,140);
+
+	ST7789_DrawString_10x16 (50, 20,  "FM24CL04 -", text_color);
+	ST7789_DrawString_10x16 (50, 40,  "W25Q64   -", text_color);
+	ST7789_DrawString_10x16 (50, 60,  "DS3231   -", text_color);
+	ST7789_DrawString_10x16 (50, 80,  "SHT30    -", text_color);
+	ST7789_DrawString_10x16 (50, 100, "Ra-02    -", text_color);
 
 	//---------------------------------------------------------------
 	if ((dev_i2c & 0x01)==0x01) {			//fram

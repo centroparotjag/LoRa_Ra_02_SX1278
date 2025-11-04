@@ -14,6 +14,7 @@
 #include <stdio.h>
 
 #include "st7789.h"
+extern  defaultTaskHandle;
 
 float humidity_on_board = 0;
 
@@ -21,7 +22,8 @@ extern I2C_HandleTypeDef hi2c1;
 extern uint8_t MENU_stage;
 extern uint8_t RTC_view;
 
-extern  defaultTaskHandle;
+
+
 
 // Function to calculate CRC-8/NRSC-5
 uint8_t calculate_crc8_nrsc5(const uint8_t *data, size_t length) {
@@ -167,7 +169,7 @@ void displayed_t_h (void){
 	uint8_t checksum_status_0r	= (status & 0x0001) ? 1 : 0;
 
 
-	char pBuff [20];
+	char pBuff [24];
 	ST7789_DrawString_10x16 (5, 85, "Status register SHT30", CYAN);
 
 	ST7789_DrawRectangle(0, 111, 239, 239, CYAN);
