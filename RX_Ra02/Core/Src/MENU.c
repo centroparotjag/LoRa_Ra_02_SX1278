@@ -110,15 +110,15 @@ void MENU_SELEKTOR (void){
 
 	//-------- read T DS18B20------------------------
     uint32_t count_sec_cicle = sec_time - RX_fix_time_sec;
-	if (count_sec_cicle%60 == 2){
+	if (count_sec_cicle%60 == 2 || count_sec_cicle%60 == 28 ){
 		Power_DS18B20 (1);
 		flag_status_read_T_DS18B20 = 1;
 	}
-	if (count_sec_cicle%60 == 3 && flag_status_read_T_DS18B20 == 1){
+	if ((count_sec_cicle%60 == 3 || count_sec_cicle%60 == 29) && flag_status_read_T_DS18B20 == 1){
 		START__DS18B20_CONVERT_TEMPERATURE ();
 		flag_status_read_T_DS18B20 = 2;
 	}
-	if (count_sec_cicle%60 == 4 && flag_status_read_T_DS18B20 == 2){
+	if ((count_sec_cicle%60 == 4 || count_sec_cicle%60 == 30) && flag_status_read_T_DS18B20 == 2){
 		uint16_t T_DS18B20 = READ_DS18B20_TEMPERATURE ();
 		Power_DS18B20 (0);
 		flag_status_read_T_DS18B20 = 0;
@@ -130,6 +130,10 @@ void MENU_SELEKTOR (void){
 		}
 		MENU_update = 1;
 
+	}
+	if (count_sec_cicle%60 == 5 || count_sec_cicle%60 == 35 ){
+		Power_DS18B20 (0);
+		flag_status_read_T_DS18B20 = 0;
 	}
 	//-----------------------------------------------
 
@@ -306,12 +310,12 @@ void MENU_O (void){
 
 			//---- h aligned -----------
 			if(humidity <10) {
-				sprintf (buff, " %.2f%%" , humidity);
+				sprintf (buff, "  %.2f%%" , humidity);
 			}
 			else {
-				sprintf (buff, "%.2f%%" , humidity);
+				sprintf (buff, " %.2f%%" , humidity);
 			}
-			ST7789_DrawString_26x30_background (38, 73, buff,  col_h, frame_fill_color);
+			ST7789_DrawString_26x30_background (12, 73, buff,  col_h, frame_fill_color);
 
 			//------ battery voltage -------------
 			if(Vbat < (BATT_LOW_VOLTAGE+0.2))  {
@@ -348,10 +352,11 @@ void MENU_O (void){
 
 	uint32_t sec = sec_time - RX_fix_time_sec;
 	uint8_t Hms[3]={0};
+	char b[24]={9};
 	convert_time_sec_to_H_m_s (sec, Hms);
 	//for(uint8_t i=0; i<24; ++i) {buff[i]=0;}
-	sprintf (buff, "%02d:%02d:%02d", Hms[0], Hms[1], Hms[2]);
-	ST7789_DrawString_10x16_background(153, 111, buff, col_V, frame_fill_color);			//col_V
+	sprintf (b, "%02d:%02d:%02d", Hms[0], Hms[1], Hms[2]);
+	ST7789_DrawString_10x16_background(153, 111, b, col_V, frame_fill_color);			//col_V
 
 	//====================== On board meteo ====================================
 //	sprintf (buff, "T=%.2f C" , TMP_ds18b20);

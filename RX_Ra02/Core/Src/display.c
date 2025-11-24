@@ -17,6 +17,10 @@ extern uint8_t RTC_view;
 extern uint16_t background_color;
 extern uint8_t MENU_update;
 extern uint8_t MENU_stage;
+extern uint8_t flag_status_read_T_DS18B20;
+extern uint8_t LoRa_receive_data;
+extern float T_ob_fix;
+extern float H_ob_fix;
 
 void power_on_displayed (void){
 	uint16_t color;
@@ -139,8 +143,13 @@ void shutdown_displayed (void){
 			ST7789_DrawString_10x16 (90, 112, "Return.", RED);
 			HAL_Delay(1000);
 			ST7789_FillScreen(BLACK);
+			LoRa_receive_data = 1;
 			MENU_update = 1;
 			MENU_stage = 0;
+			T_ob_fix = 100;
+			H_ob_fix = 100;
+			//m_set = 0;
+			//flag_status_read_T_DS18B20 = 0;
 		}
 	}
 }
