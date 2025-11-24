@@ -309,13 +309,14 @@ void MENU_O (void){
 			//-----------------------
 
 			//---- h aligned -----------
+			char b1[9]={0};
 			if(humidity <10) {
-				sprintf (buff, "  %.2f%%" , humidity);
+				sprintf (b1, "  %.2f%%" , humidity);
 			}
 			else {
-				sprintf (buff, " %.2f%%" , humidity);
+				sprintf (b1, " %.2f%%" , humidity);
 			}
-			ST7789_DrawString_26x30_background (12, 73, buff,  col_h, frame_fill_color);
+			ST7789_DrawString_26x30_background (12, 73, b1,  col_h, frame_fill_color);
 
 			//------ battery voltage -------------
 			if(Vbat < (BATT_LOW_VOLTAGE+0.2))  {
