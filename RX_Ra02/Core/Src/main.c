@@ -151,7 +151,7 @@ int main(void)
   Power_DS18B20 (1);
   HAL_Delay(5);
   TEST_AND_WRITE_DEFAULT_SRAM ();	// DS18B20
-
+  ST7789_SetBL(40);
   //-------- erase fram - statistic ------------------
   //fram_erase_full ();
   //-----------------------------------------------

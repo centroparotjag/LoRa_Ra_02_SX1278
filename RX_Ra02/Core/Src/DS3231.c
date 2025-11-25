@@ -21,6 +21,7 @@ extern uint8_t MENU_update;
 extern float humidity_on_board;
 uint8_t flag_once_wr_count_init = 0;
 uint32_t sec_time = 0;
+uint8_t Fl_bl = 20;
 
 void displayed_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 
@@ -67,6 +68,19 @@ void displayed_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 		mesurement_t_h_SHT30 (& temperature, & humidity_on_board);
 		MENU_update = 1;
 	}
+
+	//----------- back light LCD -----------
+	if( (H >= 22 || H < 6)  && Fl_bl > 10  ){
+		Fl_bl = 10;
+		ST7789_SetBL(Fl_bl);
+	}
+
+	if( H >= 6 && H < 22 && Fl_bl < 40){
+		Fl_bl = 40;
+		ST7789_SetBL(Fl_bl);
+	}
+
+	//--------------------------------------
 
 
 
