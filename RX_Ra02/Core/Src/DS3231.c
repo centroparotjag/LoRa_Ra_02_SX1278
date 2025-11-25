@@ -71,13 +71,13 @@ void displayed_data_time_DS3231 (uint16_t background_color, uint8_t displayed){
 
 	//----------- back light LCD -----------
 	if( (H >= 22 || H < 6)  && Fl_bl > 10  ){
+		ST7789_SetBL(10);
 		Fl_bl = 10;
-		ST7789_SetBL(Fl_bl);
 	}
 
 	if( H >= 6 && H < 22 && Fl_bl < 40){
+		ST7789_SetBL(40);
 		Fl_bl = 40;
-		ST7789_SetBL(Fl_bl);
 	}
 
 	//--------------------------------------

@@ -38,6 +38,7 @@ float TMP_ds18b20 = 0;
 extern float humidity_on_board;
 float T_ob_fix = 1;
 float H_ob_fix = 1;
+extern float Ubat;
 
 extern  defaultTaskHandle;
 
@@ -236,7 +237,7 @@ void MENU_O (void){
 	if(MENU_stage == 0){
 		vTaskSuspend(defaultTaskHandle);
 		ST7789_FillScreen(background_color);
-		//ST7789_FillScreen(background_color);
+
 		//----------- extern data -------
 		ST7789_DrawRectangleFilled(0, 25, 239, 135, frame_fill_color);
 		ST7789_DrawRectangle(0, 25, 239, 135, frame_color);
@@ -249,14 +250,17 @@ void MENU_O (void){
 		ST7789_DrawLine(0, 105, 239, 105, frame_color);
 		ST7789_DrawLine(0, 106, 239, 106, frame_color);
 
+		ST7789_DrawLine(196, 65, 196, 105, frame_color);		// bat
+		ST7789_DrawLine(197, 65, 197, 105, frame_color);
+
 		ST7789_DrawLine(44, 105, 44, 135, frame_color);
 		ST7789_DrawLine(45, 105, 45, 135, frame_color);
 
-		ST7789_DrawLine(145, 105, 145, 135, frame_color);
-		ST7789_DrawLine(146, 105, 146, 135, frame_color);
+		ST7789_DrawLine(137, 105, 137, 135, frame_color);
+		ST7789_DrawLine(138, 105, 138, 135, frame_color);
 
 		ST7789_DrawString_10x16_background(80, 37, "NO DATA", RGB565(150,150,150), frame_fill_color);
-		ST7789_DrawString_10x16_background(40, 77, "WAITING FOR DATA", RGB565(150,150,150), frame_fill_color);
+		ST7789_DrawString_10x16_background(15, 77, "WAITING FOR DATA", RGB565(150,150,150), frame_fill_color);
 
 		//----------- on board data -------
 		ST7789_DrawRectangleFilled(0, 150, 239, 239, frame_fill_color_ob);
@@ -266,14 +270,16 @@ void MENU_O (void){
 
 		ST7789_DrawLine(0, 194,  239, 194, frame_color_ob);
 		ST7789_DrawLine(0, 195,  239, 195, frame_color_ob);
+
+		ST7789_DrawLine(196, 194, 196, 237, frame_color);		// bat
+		ST7789_DrawLine(197, 194, 197, 237, frame_color);
+
 		MENU_stage = 1;
 	}
 
 
 	if (LoRa_receive_data == 1){
 		//-------------------------------------------------------------------------------------------------
-
-
 		ST7789_DrawRectangleFilled(4, 108, 43, 132, RED);
 		ST7789_DrawString_10x16_background(15, 111, "RX", YELLOW, RED);
 
@@ -311,21 +317,25 @@ void MENU_O (void){
 			//---- h aligned -----------
 			char b1[9]={0};
 			if(humidity <10) {
-				sprintf (b1, "  %.2f%%" , humidity);
+				sprintf (b1, "  %.1f%% " , humidity);
 			}
 			else {
-				sprintf (b1, " %.2f%%" , humidity);
+				sprintf (b1, " %.1f%%" , humidity);
 			}
-			ST7789_DrawString_26x30_background (12, 73, b1,  col_h, frame_fill_color);
+			ST7789_DrawString_26x30_background (10, 73, b1,  col_h, frame_fill_color);
+
+			//----------- battery level ------------------
+			battery_level_10_18 (210, 73, Vbat);
 
 			//------ battery voltage -------------
+			char b2[9]={0};
 			if(Vbat < (BATT_LOW_VOLTAGE+0.2))  {
-				sprintf (buff, "Low %.2fV" , Vbat);
-				ST7789_DrawString_10x16_background(52, 111, buff, RED, frame_fill_color);
+				sprintf (b2, "Low %.2fV" , Vbat);
+				ST7789_DrawString_10x16_background(144, 111, b2, RED, frame_fill_color);
 			 }
 			else {
-				sprintf (buff, "  %.2fV  " , Vbat);
-				ST7789_DrawString_10x16_background(52, 111, buff, GREEN, frame_fill_color);
+				sprintf (b2, "  %.2fV  " , Vbat);
+				ST7789_DrawString_10x16_background(144, 111, b2, GREEN, frame_fill_color);
 			}
 			//-------------------------------------------------------------------------------------------------
 			//ST7789_DrawString_10x16_background(15, 110, "  ", GREEN, frame_fill_color);
@@ -349,20 +359,15 @@ void MENU_O (void){
 		RX_fix_time_sec = sec_time;
 	}
 
-
-
 	uint32_t sec = sec_time - RX_fix_time_sec;
 	uint8_t Hms[3]={0};
-	char b[24]={9};
+	char b[24]={0};
 	convert_time_sec_to_H_m_s (sec, Hms);
 	//for(uint8_t i=0; i<24; ++i) {buff[i]=0;}
 	sprintf (b, "%02d:%02d:%02d", Hms[0], Hms[1], Hms[2]);
-	ST7789_DrawString_10x16_background(153, 111, b, col_V, frame_fill_color);			//col_V
+	ST7789_DrawString_10x16_background(53, 111, b, col_V, frame_fill_color);			//col_V
 
 	//====================== On board meteo ====================================
-//	sprintf (buff, "T=%.2f C" , TMP_ds18b20);
-//	ST7789_DrawString_10x16_background(10, 190, buff, WHITE, frame_fill_color);
-
 	if(MENU_update == 1){
 		//-------------------------------------------------------------------
 		uint16_t col_t_OB = GREEN;
@@ -374,7 +379,7 @@ void MENU_O (void){
 		if(humidity_on_board<45)     		{ col_h_OB = CYAN; }
 
 		//---- T aligned -----------
-
+		for(uint8_t i=0; i<24; ++i){ buff[i]=0; }		// clear buffer
 		if(T_ob_fix != TMP_ds18b20) {
 			if(TMP_ds18b20 <=-10 )	{sprintf (buff, "%.2f" , TMP_ds18b20);}
 			if((TMP_ds18b20 >-10 && TMP_ds18b20 < 0) || TMP_ds18b20 >= 10) {sprintf (buff, " %.2f" , TMP_ds18b20);}
@@ -386,16 +391,23 @@ void MENU_O (void){
 		}
 
 		//---- h aligned -----------
+		for(uint8_t i=0; i<24; ++i){ buff[i]=0; }		// clear buffer
 		if(H_ob_fix != humidity_on_board){
 			if(humidity_on_board <10) {
-				sprintf (buff, " %.2f%%" , humidity_on_board);
+				sprintf (buff, " %.1f%%" , humidity_on_board);
 			}
 			else {
-				sprintf (buff, "%.2f%%" , humidity_on_board);
+				sprintf (buff, "%.1f%%" , humidity_on_board);
 			}
 			ST7789_DrawString_26x30_background (38, 204, buff,  col_h_OB, frame_fill_color_ob);
 			H_ob_fix = humidity_on_board;
 		}
+
+		//----------- battery level ------------------
+		battery_level_10_18 (210, 204, Ubat);
+
+
+
 	}
 	vTaskResume(defaultTaskHandle);
 }

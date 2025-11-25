@@ -12,6 +12,7 @@
 #include "fram.h"
 #include "adc.h"
 #include "Flash_W25Q64.h"
+#include "config.h"
 
 extern uint8_t RTC_view;
 extern uint16_t background_color;
@@ -186,4 +187,67 @@ uint8_t displaying_images_from_flash (void){
 	}
 	return 1;				// Everything is done well.
 }
+
+
+void battery_level_10_18 (uint16_t x0, uint16_t y0, float V){
+	uint16_t LEVEL = 0;
+	uint16_t percent = 0;
+	float Vmax = 4.1;
+	float  delta_V_max = Vmax - BATT_LOW_VOLTAGE;
+
+	//V=3.2;
+	if (V>Vmax){ V=Vmax;}
+
+	float  delta_V = Vmax - V;
+
+	if (delta_V > delta_V_max) {delta_V = delta_V_max;}
+
+	if (V>=Vmax){
+		percent = 100;
+		LEVEL = 0;
+	}
+	else {
+		percent = (100 * delta_V)/delta_V_max;
+		LEVEL = (15*percent)/100;
+	}
+
+	//-------------------- BATT contour -------------------------------
+	uint16_t color_BATT = RGB565(255, 255, 255);
+	if (LEVEL>=14){
+		color_BATT = RGB565(255, 0, 0);
+	}
+	ST7789_DrawRectangleFilled(x0+4,  y0,    x0+11, y0+3,  color_BATT);
+	ST7789_DrawRectangleFilled(x0,    y0+3,  x0+15, y0+6,  color_BATT);
+	ST7789_DrawRectangleFilled(x0,    y0+6,  x0+3,  y0+26, color_BATT);
+	ST7789_DrawRectangleFilled(x0+3,  y0+23, x0+15, y0+26, color_BATT);
+	ST7789_DrawRectangleFilled(x0+12, y0+6,  x0+15, y0+23, color_BATT);
+	ST7789_DrawRectangle      (x0+3,  y0+6,  x0+11, y0+22, BLACK);
+	//------------------------------------------------------------------
+
+
+	uint8_t x1_l=x0+4;
+	uint8_t y1_l=y0+7;
+	uint8_t x2_l=x0+11;
+	uint8_t y2_l=y0+22;
+
+
+	uint16_t color_level = RGB565(0, 255, 0);
+	if (LEVEL > 10 ){
+		color_level = RGB565(255, 0, 0);
+	}
+
+	//--------------------- level ----------------------------------------------
+	if (LEVEL != 15){
+		ST7789_DrawRectangleFilled(x1_l, y1_l + LEVEL,  x2_l, y2_l, color_level);
+	}
+
+	//--------------------- fone ----------------------------------------------
+	ST7789_DrawRectangleFilled(x1_l-1, y1_l-1,  x2_l, y2_l-(14-LEVEL), BLACK);
+
+
+
+}
+
+
+
 
