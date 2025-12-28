@@ -367,6 +367,23 @@ void MENU_O (void){
 	sprintf (b, "%02d:%02d:%02d", Hms[0], Hms[1], Hms[2]);
 	ST7789_DrawString_10x16_background(53, 111, b, col_V, frame_fill_color);			//col_V
 
+	//-------- ERROR LAST_RECEIVE_DATA ------------------------------------------------------------------
+
+	if(sec%300 == 0 && sec > 0 ) {
+		LoRa_receive_data = 0;
+		LoRa_reset(&myLoRa);
+		LoRa_init(&myLoRa);
+		LoRa_startReceiving(&myLoRa);
+
+		if(sec==1800){
+			LoRa_receive_data = 0;
+			MENU_stage = 0;
+		}
+	}
+
+
+
+
 	//====================== On board meteo ====================================
 	if(MENU_update == 1){
 		//-------------------------------------------------------------------
