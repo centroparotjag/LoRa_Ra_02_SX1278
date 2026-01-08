@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include "data_encoding.h"
 
+# define DATA_LOST 	1800		//seconds 1800
+# define RESTART_RX 300		//seconds 300
 
 uint8_t MENU = 0;
 uint8_t MENU_update = 1;
@@ -26,6 +28,8 @@ uint8_t MENU_stage = 0;
 uint8_t state_but = 0;
 uint8_t m_set = 0;
 uint8_t set_pos = 8;
+uint32_t sec;
+uint8_t TX_presence = 0;
 extern uint16_t background_color;
 extern uint8_t RTC_view;
 extern uint8_t m_counter;
@@ -259,7 +263,12 @@ void MENU_O (void){
 		ST7789_DrawLine(137, 105, 137, 135, frame_color);
 		ST7789_DrawLine(138, 105, 138, 135, frame_color);
 
-		ST7789_DrawString_10x16_background(80, 37, "NO DATA", RGB565(150,150,150), frame_fill_color);
+		if(sec>=DATA_LOST){			// data lost
+			ST7789_DrawString_10x16_background(70, 37, "TX LOST  !!!", RGB565(255,0,0), frame_fill_color);
+		}
+		else {
+			ST7789_DrawString_10x16_background(80, 37, "NO DATA", RGB565(150,150,150), frame_fill_color);
+		}
 		ST7789_DrawString_10x16_background(15, 77, "WAITING FOR DATA", RGB565(150,150,150), frame_fill_color);
 
 		//----------- on board data -------
@@ -288,6 +297,7 @@ void MENU_O (void){
 		uint8_t CRC_check = DecodingAndVerificationOfDataPacket (LoRa_RxBuffer, DecodedDataPacket);
 
 		if (CRC_check == 1){
+			TX_presence = 1;
 			//------------- convert raw data to T, h----------------------------------
 			uint16_t temp_raw = 0;
 			uint16_t hum_raw  = 0;
@@ -339,7 +349,7 @@ void MENU_O (void){
 			}
 			//-------------------------------------------------------------------------------------------------
 			//ST7789_DrawString_10x16_background(15, 110, "  ", GREEN, frame_fill_color);
-			ST7789_DrawRectangleFilled(4, 108, 43, 132, frame_fill_color);		// clear "RX"
+			ST7789_DrawRectangleFilled(3, 108, 44, 132, frame_fill_color);		// clear "RX"
 			LoRa_receive_data = 0;
 
 		}
@@ -359,7 +369,7 @@ void MENU_O (void){
 		RX_fix_time_sec = sec_time;
 	}
 
-	uint32_t sec = sec_time - RX_fix_time_sec;
+	sec = sec_time - RX_fix_time_sec;
 	uint8_t Hms[3]={0};
 	char b[24]={0};
 	convert_time_sec_to_H_m_s (sec, Hms);
@@ -369,20 +379,26 @@ void MENU_O (void){
 
 	//-------- ERROR LAST_RECEIVE_DATA ------------------------------------------------------------------
 
-	if(sec%300 == 0 && sec > 0 ) {
+	if(sec%RESTART_RX == 0 && sec > 0 ) {
 		LoRa_receive_data = 0;
 		LoRa_reset(&myLoRa);
 		LoRa_init(&myLoRa);
 		LoRa_startReceiving(&myLoRa);
 
-		if(sec==1800){
-			LoRa_receive_data = 0;
-			MENU_stage = 0;
+		if(TX_presence == 1){
+			ST7789_DrawRectangleFilled(4, 108, 43, 132, RED);
+			ST7789_DrawString_10x16_background(4, 111, "LOST", YELLOW, RED);
+
+			if(sec==DATA_LOST){
+				MENU_stage = 0;
+				RX_fix_time_sec--;
+				for(uint8_t i=0; i<7; i++){
+					LoRa_RxBuffer[i] = 0;
+				}
+
+			}
 		}
 	}
-
-
-
 
 	//====================== On board meteo ====================================
 	if(MENU_update == 1){
