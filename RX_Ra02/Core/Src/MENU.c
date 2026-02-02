@@ -309,6 +309,8 @@ void MENU_O (void){
 			float humidity = 100.0f * ((float)hum_raw / 65535.0f);
 			float Vbat = (DecodedDataPacket[4]+250.0f)/100.0f;
 
+			humidity = humidity_correction (humidity);
+
 			//-------------------------------------------------------------------
 			if(temperature>=28) 				{ col_t = YELLOW; }
 			if(temperature<15)  				{ col_t = CYAN;   }
@@ -405,6 +407,8 @@ void MENU_O (void){
 		//-------------------------------------------------------------------
 		uint16_t col_t_OB = GREEN;
 		uint16_t col_h_OB = GREEN;
+
+		humidity_on_board = humidity_correction (humidity_on_board);
 
 		if(TMP_ds18b20>=28) 				{ col_t_OB = YELLOW; }
 		if(TMP_ds18b20<15)  				{ col_t_OB = CYAN;   }
@@ -725,6 +729,15 @@ void MENU_RTC (void){
 	draw_position (set_pos, set_color, main_color);
 	vTaskResume(defaultTaskHandle);
 }
+
+float humidity_correction (float measured_humidity){
+	float k = (100-measured_humidity)/2;
+	float Hc = (measured_humidity <= k) ? 0 : measured_humidity-k;
+	return Hc;
+}
+
+
+
 
 
 
