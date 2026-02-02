@@ -729,22 +729,30 @@ void MENU_RTC (void){
 }
 
 float humidity_correction (float measured_humidity){
+	float k_H = 1.1;
+	float k_L = 1.7;
 
 	if (measured_humidity <= 0) {
 		return 0;
 	}
 
-	float k = (100-measured_humidity)/2;
-	float Hc = 0;
+	//------------------------------------------------
+	float H = measured_humidity * k_H;
 
-	if (measured_humidity <= k){
-		Hc = 0;
+	if (measured_humidity >= 100) {
+		return 100;
+	}
+	//-----------------------------------------------
+
+	float k = (100-H)/k_L;
+
+	if (H <= k){
+		return 0;
 	}
 	else {
-		Hc = measured_humidity-k;
+		return H-k;
 	}
 
-	return Hc;
 }
 
 
