@@ -12,6 +12,7 @@
 #include "config.h"
 #include "display.h"
 #include <stdio.h>
+#include "MENU.h"
 
 #include "st7789.h"
 extern  defaultTaskHandle;
@@ -122,6 +123,8 @@ uint8_t mesurement_t_h_SHT30 (float* temperature, float* humidity){
 
 	* temperature = (175.0f * ((float)temp_raw / 65535.0f)) - 45.0f;
 	* humidity = 100.0f * ((float)hum_raw / 65535.0f);
+
+	* humidity = humidity_correction (* humidity);
 
 	return 1;
 }

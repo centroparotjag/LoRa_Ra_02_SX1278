@@ -408,8 +408,6 @@ void MENU_O (void){
 		uint16_t col_t_OB = GREEN;
 		uint16_t col_h_OB = GREEN;
 
-		humidity_on_board = humidity_correction (humidity_on_board);
-
 		if(TMP_ds18b20>=28) 				{ col_t_OB = YELLOW; }
 		if(TMP_ds18b20<15)  				{ col_t_OB = CYAN;   }
 		if(humidity_on_board>=65)    		{ col_h_OB = YELLOW;   }
@@ -731,8 +729,21 @@ void MENU_RTC (void){
 }
 
 float humidity_correction (float measured_humidity){
+
+	if (measured_humidity <= 0) {
+		return 0;
+	}
+
 	float k = (100-measured_humidity)/2;
-	float Hc = (measured_humidity <= k) ? 0 : measured_humidity-k;
+	float Hc = 0;
+
+	if (measured_humidity <= k){
+		Hc = 0;
+	}
+	else {
+		Hc = measured_humidity-k;
+	}
+
 	return Hc;
 }
 
